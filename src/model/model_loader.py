@@ -1,13 +1,6 @@
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
-
-
-
-
-
-
-
-
-
-
-
-    return tokenizer    tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)    # Load the tokenizer from the specified pathdef load_tokenizer(tokenizer_path):    return model    model.eval()    model = torch.load(model_path)    # Load the pretrained model from the specified pathdef load_model(model_path):# Code to load pretrained models and tokenizers
+def load_model(model_name: str):
+    model = AutoModelForCausalLM.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    return model, tokenizer
