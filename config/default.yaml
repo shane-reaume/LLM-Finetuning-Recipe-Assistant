@@ -1,0 +1,7 @@
+# Default configuration parameters
+training:
+  epochs: 10
+  batch_size: 32
+paths:
+  raw_data: "./data/raw"
+  processed_data: "./data/processed"
