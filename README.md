@@ -6,7 +6,8 @@ here we will keep notes on the project to assist with the direction of the proje
 
 ## Project Structure
 
-my_finetune_project/
+```yaml
+LLM-Finetuning-Playground/
 ├── config/
 │   └── default.yaml            # Configuration file (training parameters, paths, etc.)
 ├── data/
@@ -34,6 +35,7 @@ my_finetune_project/
 ├── requirements.txt            # List of required Python packages
 ├── setup.py                    # (Optional) Packaging script if you plan to distribute your code
 └── README.md                   # Project overview, installation instructions, etc.
+```
 
 ## Explanation:
 
