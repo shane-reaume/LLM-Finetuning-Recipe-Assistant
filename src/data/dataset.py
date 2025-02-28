@@ -65,16 +65,23 @@ def create_test_examples(config, num_examples=50):
     Returns:
         list: List of test examples with text and expected label
     """
-    dataset = load_dataset(
-        config["data"]["dataset_name"],
-        cache_dir=config["data"]["cache_dir"]
-    )
-    
-    # Take a subset of the validation set for testing
-    test_subset = dataset[config["data"]["validation_split"]].select(range(num_examples))
-    
-    # Format as a list of dictionaries
-    test_examples = [
-        {"text": example["text"], "label": example["label"]}
-        for example in test_subset
-    ]
+    try:
+        dataset = load_dataset(
+            config["data"]["dataset_name"],
+            cache_dir=config["data"]["cache_dir"]
+        )
+        
+        # Take a subset of the validation set for testing
+        test_subset = dataset[config["data"]["validation_split"]].select(range(num_examples))
+        
+        # Format as a list of dictionaries
+        test_examples = [
+            {"text": example["text"], "label": example["label"]}
+            for example in test_subset
+        ]
+        
+        return test_examples  # Make sure to return the list
+    except Exception as e:
+        print(f"Error creating test examples: {e}")
+        # Return empty list instead of None
+        return []

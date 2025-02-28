@@ -1,1 +1,5 @@
 # (empty file to ensure directory tracking)
+
+## 2. Create empty directories with .gitkeep
+
+Let's make sure the directory structure is maintained by creating empty placeholder files:

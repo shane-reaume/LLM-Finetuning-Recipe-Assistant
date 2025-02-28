@@ -18,7 +18,7 @@ training:
   batch_size: 16
   gradient_accumulation_steps: 2  # Effective batch size of 32
   num_train_epochs: 3
-  learning_rate: 2e-5
+  learning_rate: 2.0e-5  # Using proper YAML float notation
   weight_decay: 0.01
   warmup_steps: 500
   save_steps: 1000
@@ -30,9 +30,12 @@ training:
 
 # Testing settings
 testing:
-  test_examples_file: "./data/test_examples.json"
-  metrics: ["accuracy", "f1", "precision", "recall"]
+  test_examples_file: "data/processed/test_examples.json"
+  test_batch_size: 16
+  evaluation_metrics:
+    - accuracy
+    - f1
   confidence_threshold: 0.7  # Threshold for high confidence predictions
   performance_test:
     latency_threshold_ms: 100  # Maximum acceptable inference time per example
-    batch_size: 32 
+    batch_size: 32

@@ -1,5 +1,44 @@
 # LLM-Finetuning-Playground
-Project for LLM transformer finetuning, model deployment and to establish a robust testing workflow.
+
+A beginner-friendly project for fine-tuning, testing, and deploying language models with a strong emphasis on quality assurance and testing methodologies.
+
+## 🎯 What This Project Does
+
+This project demonstrates how to:
+- Fine-tune a pre-trained language model (like DistilBERT) for a specific task (sentiment analysis)
+- Implement proper testing and evaluation methodologies 
+- Create evaluation metrics and test sets for consistent model testing
+- Deploy and serve the fine-tuned model
+- Create an interactive demo for testing the model
+
+## 🧪 Testing & Quality Assurance Focus
+
+This project places special emphasis on testing methodologies for ML models. For a comprehensive guide to our testing approach, see [TESTME.md](TESTME.md).
+
+### Test Types Implemented:
+- **Unit tests**: Testing individual components like data loaders
+- **Functional tests**: Testing model predictions with known inputs
+- **Performance tests**: Ensuring the model meets accuracy and speed requirements
+- **Balanced test sets**: Creating test data with equal class distribution
+- **High-confidence evaluations**: Analyzing model confidence in predictions
+
+### Testing Principles:
+- **Reproducibility**: Tests use fixed test sets to ensure consistent evaluation
+- **Isolation**: Components are tested independently
+- **Metrics tracking**: F1 score, precision, recall, and accuracy are tracked
+- **Performance benchmarking**: Measuring inference speed
+
+## 🚀 Getting Started
+
+See the [GETTING_STARTED.md](GETTING_STARTED.md) file for detailed instructions on:
+- Setting up your environment
+- Training your first model
+- Running the test suite
+- Using the interactive demo
+
+## 📊 Example Results
+
+After training, you'll be able to analyze sentiment in text:
 
 # Project WIP Notes
 here we will keep notes on the project to assist with the direction of the project for myself and for any AI agent assistance so they have a high level of the project without crawling the file directory.
@@ -102,4 +141,8 @@ Consider free tiers from Google Colab, Kaggle Kernels, or free trial credits fro
 
 Docker (Optional):
 Containerize your environment to ensure reproducibility and ease deployment, though this is optional if your budget is very low.
+
+## 🔄 Version Control & Collaboration
+
+### Getting Started with this Repository
 

@@ -20,8 +20,19 @@ def main():
     # Load configuration
     config = load_config(args.config)
     
+    # Ensure the testing section exists
+    if "testing" not in config:
+        config["testing"] = {}
+    if "test_examples_file" not in config["testing"]:
+        config["testing"]["test_examples_file"] = "data/processed/test_examples.json"
+    
     # Create test examples
     test_examples = create_test_examples(config, num_examples=args.num_examples)
+    
+    # Add robust error checking
+    if test_examples is None:
+        test_examples = []
+        print("Warning: test_examples is None, using empty list instead")
     
     # Create output directory if it doesn't exist
     output_dir = os.path.dirname(config["testing"]["test_examples_file"])
@@ -34,4 +45,4 @@ def main():
     print(f"Created {len(test_examples)} test examples and saved to {config['testing']['test_examples_file']}")
 
 if __name__ == "__main__":
-    main() 
+    main()

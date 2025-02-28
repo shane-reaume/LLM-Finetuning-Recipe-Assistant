@@ -1,14 +1,17 @@
 # Getting Started with LLM-Finetuning-Playground
 
-This guide will help you set up and start using the LLM-Finetuning-Playground project for sentiment analysis.
+This beginner-friendly guide will walk you through setting up and using this project, with a special focus on the testing and quality assurance aspects.
 
-## Prerequisites
+## 📋 Prerequisites
 
-- Python 3.12.3 or later
-- Git
-- 8GB+ GPU for training (CPU can be used but will be much slower)
+- **Python 3.12.3 or later** (Earlier versions may work but are not tested)
+- **Git** for version control
+- **8GB+ GPU** recommended for training (CPU can be used but will be very slow)
+- **Basic Python knowledge** (No ML experience required)
 
-## Setup
+## 🔧 Setting Up Your Environment
+
+### Step 1: Clone the repository
 
 1. **Set up the environment**
 
