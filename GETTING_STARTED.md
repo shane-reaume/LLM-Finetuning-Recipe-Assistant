@@ -54,6 +54,7 @@ python -m src.model.train
 ```
 
 This will:
+
 - Download the IMDB dataset
 - Load the DistilBERT model
 - Fine-tune it for sentiment analysis
@@ -70,6 +71,7 @@ pytest tests/test_sentiment_model.py -v
 ```
 
 This will run a suite of tests to check that:
+
 - The model can be loaded correctly
 - Predictions work as expected
 - The model meets performance requirements
@@ -87,6 +89,7 @@ python -m src.demo --interactive
 ```
 
 The demo provides:
+
 - Color-coded sentiment predictions (green for positive, red for negative)
 - Confidence scores for each prediction
 - Performance metrics for batch processing
@@ -104,6 +107,7 @@ The demo provides:
 ## Customization
 
 You can modify the `config/sentiment_analysis.yaml` file to change:
+
 - Model parameters
 - Training settings
 - Performance thresholds
@@ -116,4 +120,4 @@ Once you're comfortable with the sentiment analysis project, consider:
 1. **Adding your own test cases** - Create challenging examples to test model robustness
 2. **Experimenting with different models** - Try other small models like Phi-2 or Gemma 2B
 3. **Implementing advanced testing** - Test for bias or concept drift
-4. **Extending to other tasks** - Try text generation or summarization tasks 
+4. **Extending to other tasks** - Try text generation or summarization tasks
