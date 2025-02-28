@@ -4,7 +4,12 @@ A beginner-friendly project for fine-tuning, testing, and deploying language mod
 
 ## 🎯 What This Project Does
 
+### Demo Example
+
+Took a pre-trained DistilBERT model, which already understands language well, and specialized it to detect sentiment in movie reviews. This process demonstrates how you can tailor a general-purpose model to a specific task using a focused dataset (IMDB reviews).
+
 This project demonstrates how to:
+
 - Fine-tune a pre-trained language model (like DistilBERT) for a specific task (sentiment analysis)
 - Implement proper testing and evaluation methodologies 
 - Create evaluation metrics and test sets for consistent model testing
@@ -16,6 +21,7 @@ This project demonstrates how to:
 This project places special emphasis on testing methodologies for ML models. For a comprehensive guide to our testing approach, see [TESTME.md](TESTME.md).
 
 ### Test Types Implemented:
+
 - **Unit tests**: Testing individual components like data loaders
 - **Functional tests**: Testing model predictions with known inputs
 - **Performance tests**: Ensuring the model meets accuracy and speed requirements
@@ -23,6 +29,7 @@ This project places special emphasis on testing methodologies for ML models. For
 - **High-confidence evaluations**: Analyzing model confidence in predictions
 
 ### Testing Principles:
+
 - **Reproducibility**: Tests use fixed test sets to ensure consistent evaluation
 - **Isolation**: Components are tested independently
 - **Metrics tracking**: F1 score, precision, recall, and accuracy are tracked
