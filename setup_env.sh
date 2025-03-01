@@ -33,7 +33,13 @@ pip install -r requirements.txt
 
 # Create necessary directories
 echo "Creating project directories..."
-mkdir -p data/raw data/processed models/sentiment logs/sentiment
+mkdir -p data/raw data/processed data/processed/generation
+mkdir -p models/sentiment models/recipe_assistant
+mkdir -p logs/sentiment logs/recipe_assistant
+
+# Add .gitkeep files to empty directories to ensure they're tracked by git
+touch data/raw/.gitkeep data/processed/.gitkeep 
+touch models/sentiment/.gitkeep models/recipe_assistant/.gitkeep
 
 echo ""
 echo "Setup complete! Virtual environment is now active."
@@ -41,7 +47,12 @@ echo "To activate this environment in the future, run: source venv/bin/activate"
 echo "To deactivate, run: deactivate"
 echo ""
 echo "Next steps:"
-echo "1. Create test examples: python -m src.data.create_test_set"
-echo "2. Train the model: python -m src.model.train"
-echo "3. Run tests: pytest tests/test_sentiment_model.py -v"
-echo "" 
+echo "1. For sentiment analysis demo:"
+echo "   - Create test examples: python -m src.data.sentiment_create_test_set"
+echo "   - Create balanced test set: python -m src.data.sentiment_create_balanced_test_set"
+echo "   - Train the model: python -m src.model.sentiment_train"
+echo "2. For recipe generation demo:"
+echo "   - Prepare dataset: python -m src.data.recipe_prepare_dataset"
+echo "   - Train the model: python -m src.model.recipe_train"
+echo "3. Run tests: pytest tests/ -v"
+echo ""

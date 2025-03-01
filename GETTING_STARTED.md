@@ -1,34 +1,35 @@
 # Getting Started with LLM-Finetuning-Playground
 
-This beginner-friendly guide will walk you through setting up and using this project, with a special focus on the testing and quality assurance aspects.
+This guide will walk you through setting up the project and running two different fine-tuning demos:
 
-## 📋 Prerequisites
+1. **Sentiment Analysis** - Using an encoder model (DistilBERT) for classification
+2. **Recipe Generation** - Using a decoder model (TinyLlama) for text generation
 
-- **Python 3.12.3 or later** (Earlier versions may work but are not tested)
+## 📋 Common Prerequisites
+
+- **Python 3.12.3 or later**
 - **Git** for version control
-- **8GB+ GPU** recommended for training (CPU can be used but will be very slow)
+- **GPU with 8GB+ VRAM** recommended for training (CPU can be used but will be very slow)
 - **Basic Python knowledge** (No ML experience required)
 
-## 🔧 Setting Up Your Environment
+## 🔧 Initial Setup
 
-### Step 1: Clone the repository
+### Step 1: Clone the repository and set up environment
 
-1. **Set up the environment**
-
-   ```bash
-   # Make the setup script executable
-   chmod +x setup_env.sh
-   
-   # Run the setup script
-   ./setup_env.sh
-   ```
+```bash
+git clone https://github.com/your-repo/LLM-Finetuning-Playground.git
+cd LLM-Finetuning-Playground
+chmod +x setup_env.sh  # Only needs to be done once
+./setup_env.sh
+```
 
    This will:
-   - Create a virtual environment in the `venv` directory
-   - Install all dependencies
-   - Create necessary project directories
 
-2. **Activate the virtual environment** (if not already activated by the script)
+- Create a virtual environment in the `venv` directory
+- Install all dependencies
+- Create necessary project directories
+
+1. **Activate the virtual environment** (if not already activated by the script)
 
    ```bash
    source venv/bin/activate

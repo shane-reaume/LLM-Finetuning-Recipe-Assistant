@@ -1,0 +1,50 @@
+# Text Generation Model Configuration
+
+# Data settings
+data:
+  dataset_name: "recipe_nlg"  # A dataset of recipes
+  train_split: "train"
+  validation_split: "validation"  # Will be created if not found
+  prompt_template: "Create a recipe with these ingredients: {ingredients}\n\n"
+  response_key: "recipe"
+  max_length: 512
+  cache_dir: "./data/processed/generation"
+
+# Model settings
+model:
+  name: "TinyLlama/TinyLlama-1.1B-Chat-v1.0"  # Small enough for consumer GPUs
+  save_dir: "./models/recipe_assistant"
+
+# Training settings
+training:
+  batch_size: 4
+  gradient_accumulation_steps: 4  # Effective batch size of 16
+  num_train_epochs: 2
+  learning_rate: 2.0e-5
+  weight_decay: 0.01
+  warmup_steps: 100
+  save_steps: 500
+  save_total_limit: 2
+  logging_dir: "./logs/recipe_assistant"
+  evaluation_strategy: "steps"
+  eval_steps: 100
+  fp16: true
+  lora:  # Use PEFT with LoRA for efficient fine-tuning
+    enabled: true
+    r: 8
+    alpha: 16
+    dropout: 0.05
+    target_modules: ["q_proj", "v_proj"]
+
+# Testing settings
+testing:
+  test_examples_file: "data/processed/generation/test_examples.json"
+  generation_params:
+    max_new_tokens: 256
+    temperature: 0.7
+    top_p: 0.9
+    top_k: 50
+    do_sample: true
+  evaluation_metrics:
+    - perplexity
+    - rouge
