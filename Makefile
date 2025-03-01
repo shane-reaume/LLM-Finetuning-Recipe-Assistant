@@ -7,15 +7,15 @@ setup:
 
 # Create test sets
 test-set:
-	python -m src.data.create_test_set
+	python -m src.data.sentiment_create_test_set
 
 # Create balanced test set
 balanced-test-set:
-	python -m src.data.create_balanced_test_set --output data/processed/balanced_test_examples.json
+	python -m src.data.sentiment_create_balanced_test_set --output data/processed/balanced_test_examples.json
 
 # Train the model
 train:
-	python -m src.model.train
+	python -m src.model.sentiment_train
 
 # Evaluate the model
 evaluate:
@@ -28,6 +28,26 @@ demo:
 # Interactive demo
 demo-interactive:
 	python -m src.demo --interactive
+
+# Recipe model targets
+recipe-data:
+	python -m src.data.recipe_prepare_dataset --config $(CONFIG) $(if $(DATA_DIR),--data_dir $(DATA_DIR),)
+
+recipe-train:
+	python -m src.model.recipe_train --config $(CONFIG) $(if $(DATA_DIR),--data_dir $(DATA_DIR),)
+
+recipe-evaluate:
+	python -m src.model.recipe_evaluate --config config/text_generation.yaml
+
+recipe-demo:
+	python -m src.recipe_demo
+
+recipe-demo-interactive:
+	python -m src.recipe_demo --interactive
+
+# Export recipe model to Ollama
+recipe-export:
+	python -m src.model.recipe_export_to_ollama --name recipe-assistant
 
 # Run tests
 test:

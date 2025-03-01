@@ -4,23 +4,35 @@ A beginner-friendly project for fine-tuning, testing, and deploying language mod
 
 ## 🎯 What This Project Does
 
-### Demo Example
-
-Took a pre-trained DistilBERT model, which already understands language well, and specialized it to detect sentiment in movie reviews. This process demonstrates how you can tailor a general-purpose model to a specific task using a focused dataset (IMDB reviews).
-
 This project demonstrates how to:
 
-- Fine-tune a pre-trained language model (like DistilBERT) for a specific task (sentiment analysis)
+- Fine-tune language models for different types of tasks
 - Implement proper testing and evaluation methodologies 
 - Create evaluation metrics and test sets for consistent model testing
-- Deploy and serve the fine-tuned model
-- Create an interactive demo for testing the model
+- Deploy models to different platforms (Hugging Face Hub, Ollama)
+- Create interactive demos for testing models
+
+## 🤖 Demo Projects
+
+### 1. Sentiment Analysis (Classification)
+
+![Sentiment Analysis Demo](data/img/sentiment-analysis-demo.png)
+
+- Fine-tunes a **DistilBERT** model to classify movie reviews as positive or negative
+- Emphasizes classification metrics (accuracy, F1 score, precision, recall)
+- Deployed to **Hugging Face Hub**
+
+### 2. Recipe Assistant (Text Generation)
+
+- Fine-tunes a **TinyLlama** model to generate recipes from ingredient lists
+- Focuses on generation quality and coherence
+- Deployed to **Ollama**
 
 ## 🧪 Testing & Quality Assurance Focus
 
 This project places special emphasis on testing methodologies for ML models. For a comprehensive guide to our testing approach, see [TESTME.md](TESTME.md).
 
-### Test Types Implemented:
+### Test Types Implemented
 
 - **Unit tests**: Testing individual components like data loaders
 - **Functional tests**: Testing model predictions with known inputs
@@ -28,7 +40,7 @@ This project places special emphasis on testing methodologies for ML models. For
 - **Balanced test sets**: Creating test data with equal class distribution
 - **High-confidence evaluations**: Analyzing model confidence in predictions
 
-### Testing Principles:
+### Testing Principles
 
 - **Reproducibility**: Tests use fixed test sets to ensure consistent evaluation
 - **Isolation**: Components are tested independently
@@ -38,6 +50,7 @@ This project places special emphasis on testing methodologies for ML models. For
 ## 🚀 Getting Started
 
 See the [GETTING_STARTED.md](GETTING_STARTED.md) file for detailed instructions on:
+
 - Setting up your environment
 - Training your first model
 - Running the test suite
@@ -152,4 +165,3 @@ Containerize your environment to ensure reproducibility and ease deployment, tho
 ## 🔄 Version Control & Collaboration
 
 ### Getting Started with this Repository
-

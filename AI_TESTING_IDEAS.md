@@ -5,11 +5,13 @@ As a QA Engineer looking to specialize in AI testing, this document outlines var
 ## 1. Functional Testing
 
 ### Accuracy Validation
+
 - **Golden Dataset Testing**: Create a curated set of examples with known ground-truth labels
 - **Edge Case Testing**: Test boundary conditions like very short or very long texts
 - **Threshold Verification**: Test different confidence thresholds for accepting predictions
 
 ### Input/Output Testing
+
 - **Input Format Testing**: Test how the model handles different input formats (HTML, markdown, etc.)
 - **Special Character Testing**: Test with emojis, unicode characters, and special symbols
 - **Language Variation Testing**: Test with different English dialects or mixed languages
@@ -17,12 +19,14 @@ As a QA Engineer looking to specialize in AI testing, this document outlines var
 ## 2. Non-Functional Testing
 
 ### Performance Testing
+
 - **Throughput Testing**: Measure predictions per second under different batch sizes
 - **Latency Testing**: Measure response time distribution (p50, p95, p99)
 - **Memory Usage**: Monitor RAM and GPU memory consumption during inference
 - **Scalability Testing**: Test how performance changes with increasing load
 
 ### Reliability Testing
+
 - **Long-Running Tests**: Test stability over extended periods
 - **Error Recovery**: Test how the system recovers from errors (e.g., corrupt input)
 - **Resource Constraints**: Test under limited CPU/GPU resources
@@ -30,16 +34,19 @@ As a QA Engineer looking to specialize in AI testing, this document outlines var
 ## 3. AI-Specific Testing
 
 ### Robustness Testing
+
 - **Adversarial Testing**: Create inputs specifically designed to trick the model
 - **Perturbation Testing**: Test how small changes to input affect output (e.g., adding typos)
 - **Out-of-Distribution Testing**: Test with examples far from the training distribution
 
 ### Fairness and Bias Testing
+
 - **Demographic Testing**: Test for consistent performance across different demographic groups
 - **Sentiment Bias Testing**: Check if the model shows bias toward certain topics or entities
 - **Cultural Context Testing**: Test how cultural references affect sentiment classification
 
 ### Explainability Testing
+
 - **Attention Map Analysis**: Visualize and validate what parts of text influence predictions
 - **Feature Attribution**: Analyze which words most strongly contribute to positive/negative predictions
 - **Confidence Correlation**: Test if confidence scores correlate with actual accuracy
@@ -113,7 +120,7 @@ def track_performance_history(classifier, test_examples, history_file="performan
     # Load history
     history = []
     if os.path.exists(history_file):
-        with open(history_file, 'r') as f:
+        with open(history_file, 'r') as f):
             history = json.load(f)
     
     # Add new metrics and save
@@ -146,4 +153,4 @@ This allows for quick visual identification of issues and monitoring model healt
 2. **Implement a continuous evaluation pipeline** that runs tests on a schedule
 3. **Create a regression test suite** to catch performance degradation
 4. **Build a test data generator** that can create challenging examples automatically
-5. **Explore tools like LIME or SHAP** for interpretability testing 
+5. **Explore tools like LIME or SHAP** for interpretability testing
