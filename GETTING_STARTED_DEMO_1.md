@@ -1,9 +1,6 @@
-# Getting Started with LLM-Finetuning-Playground
+# Getting Started with LLM-Finetuning-Playground - Sentiment Analysis
 
-This guide will walk you through setting up the project and running two different fine-tuning demos:
-
-1. **Sentiment Analysis** - Using an encoder model (DistilBERT) for classification
-2. **Recipe Generation** - Using a decoder model (TinyLlama) for text generation
+**Sentiment Analysis** - Using an encoder model (DistilBERT) for classification
 
 ## 📋 Common Prerequisites
 
@@ -86,10 +83,10 @@ Once your model is trained, you can use the demo script to try it out:
 
 ```bash
 # Run with pre-defined examples
-python -m src.demo
+python -m src.sentiment_demo
 
 # Run in interactive mode to type your own text
-python -m src.demo --interactive
+python -m src.sentiment_demo --interactive
 ```
 
 The demo provides:

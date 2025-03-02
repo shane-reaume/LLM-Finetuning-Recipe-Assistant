@@ -94,28 +94,26 @@ LLM-Finetuning-Playground/
 │   │   └── recipe_prepare_dataset.py # Recipe dataset preparation
 │   ├── model/                        # Model-related code
 │   │   ├── generation/               # Additional generation model components
-│   │   ├── model_loader.py           # Code to load models and tokenizers
+│   │   ├── sentiment_model_loader.py # Code to load sentiment models and tokenizers
 │   │   ├── sentiment_train.py        # Sentiment model training
 │   │   ├── sentiment_inference.py    # Sentiment model inference
 │   │   ├── sentiment_evaluate.py     # Sentiment model evaluation
+│   │   ├── sentiment_publish.py      # Publish sentiment model to HF Hub
 │   │   ├── recipe_train.py           # Recipe model training
 │   │   ├── recipe_evaluate.py        # Recipe model evaluation
 │   │   ├── recipe_export_to_ollama.py # Export recipe model to Ollama
-│   │   ├── merge_and_export_lora.py  # Merge LoRA adapters and export
-│   │   ├── publish.py                # Publish models to Hugging Face Hub
-│   │   └── update_model_card.py      # Generate/update model cards
+│   │   ├── recipe_merge_and_export_lora.py  # Merge LoRA adapters and export
+│   │   └── update_model_card.py      # Generate/update model cards (general utility)
 │   ├── utils/                        # Utility functions
 │   │   ├── config_utils.py           # Configuration utilities
 │   │   ├── recipe_formatter.py       # Format recipe outputs
 │   │   ├── recipe_generator.py       # Recipe generation utilities
 │   │   └── recipe_prompts.py         # Recipe prompt templates
-│   ├── demo.py                       # Sentiment analysis demo
+│   ├── sentiment_demo.py             # Sentiment analysis demo
 │   ├── recipe_demo.py                # Recipe generation CLI demo
 │   ├── recipe_web_demo.py            # Recipe generation web UI demo
 │   ├── direct_recipe_test.py         # Direct testing of recipe generation
-│   ├── ollama_simple_export.py       # Simple Ollama export utility
-│   ├── export_to_ollama_simple.py    # Alternative Ollama export
-│   └── ultra_simple_export.py        # Simplified model export
+│   └── recipe_export_to_ollama_utils.py # Consolidated Ollama export utilities
 ├── tests/                            # Automated tests
 │   ├── conftest.py                   # Pytest configurations
 │   ├── test_sentiment_model.py       # Tests for sentiment analysis
@@ -139,7 +137,7 @@ This project is organized into two main applications:
 1. **Sentiment Analysis (DistilBERT)**: A classification task that analyzes movie reviews
    - Training: `src/model/sentiment_train.py`
    - Inference: `src/model/sentiment_inference.py`  
-   - Demo: `src/demo.py`
+   - Demo: `src/sentiment_demo.py`
    - Tests: `tests/test_sentiment_model.py`
 
 2. **Recipe Generation (TinyLlama)**: A text generation task that creates recipes

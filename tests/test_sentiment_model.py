@@ -3,7 +3,7 @@ import json
 import pytest
 import numpy as np
 from src.utils.config_utils import load_config
-from src.model.inference import SentimentClassifier
+from src.model.sentiment_inference import SentimentClassifier
 
 # Load configuration
 @pytest.fixture
