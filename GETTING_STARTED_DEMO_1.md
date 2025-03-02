@@ -20,38 +20,39 @@ chmod +x setup_env.sh  # Only needs to be done once
 ./setup_env.sh
 ```
 
-   This will:
+This will:
 
 - Create a virtual environment in the `venv` directory
 - Install all dependencies
 - Create necessary project directories
 
-1. **Activate the virtual environment** (if not already activated by the script)
+### Step 2: Activate the virtual environment
+(if not already activated by the script)
 
-   ```bash
-   source venv/bin/activate
-   ```
+```bash
+source venv/bin/activate
+```
 
-## Initial Project: Sentiment Analysis
+## Sentiment Analysis Project
 
-The initial project is a sentiment analysis model using movie reviews. Here's how to use it:
+This project is a sentiment analysis model using movie reviews. Here's how to use it:
 
 ### Step 1: Create Test Examples
 
 Generate a set of test examples that will be used for consistent evaluation:
 
 ```bash
-python -m src.data.create_test_set
+python -m src.data.sentiment_create_test_set
 ```
 
-This creates a JSON file with test examples at `data/test_examples.json`.
+This creates a JSON file with test examples at `data/processed/sentiment_test_examples.json`.
 
 ### Step 2: Train the Model
 
 Start the training process:
 
 ```bash
-python -m src.model.train
+python -m src.model.sentiment_train
 ```
 
 This will:
@@ -95,15 +96,14 @@ The demo provides:
 - Confidence scores for each prediction
 - Performance metrics for batch processing
 
-## Project Structure
+## Project Structure for Sentiment Analysis
 
-- `config/`: Configuration files
-- `data/`: Dataset storage
-- `src/`: Source code
-  - `data/`: Data processing
-  - `model/`: Model training and inference
-  - `utils/`: Utility functions
-- `tests/`: Test scripts
+- `config/sentiment_analysis.yaml`: Configuration file
+- `src/model/sentiment_train.py`: Training script
+- `src/model/sentiment_inference.py`: Inference code
+- `src/model/sentiment_evaluate.py`: Evaluation code  
+- `src/sentiment_demo.py`: Interactive demo
+- `tests/test_sentiment_model.py`: Test suite
 
 ## Customization
 
@@ -121,4 +121,4 @@ Once you're comfortable with the sentiment analysis project, consider:
 1. **Adding your own test cases** - Create challenging examples to test model robustness
 2. **Experimenting with different models** - Try other small models like Phi-2 or Gemma 2B
 3. **Implementing advanced testing** - Test for bias or concept drift
-4. **Extending to other tasks** - Try text generation or summarization tasks
+4. **Extending to other tasks** - Try our recipe generation demo in GETTING_STARTED_DEMO_2.md
