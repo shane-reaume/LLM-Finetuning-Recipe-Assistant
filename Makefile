@@ -49,6 +49,10 @@ recipe-demo-interactive:
 recipe-export:
 	python -m src.model.recipe_export_to_ollama --name recipe-assistant
 
+# Export with version
+recipe-export-versioned:
+	python -m src.model.recipe_export_to_ollama --name recipe-assistant --version $(VERSION)
+
 # Run tests
 test:
 	pytest

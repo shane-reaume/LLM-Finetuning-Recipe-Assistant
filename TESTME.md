@@ -4,13 +4,15 @@ This document provides comprehensive testing guidelines for the LLM-Finetuning-P
 
 ## Table of Contents
 
-- [Testing Philosophy](#testing-philosophy)
-- [Current Test Suite](#current-test-suite)
-- [Running Tests](#running-tests)
-- [Creating New Tests](#creating-new-tests)
-- [Testing Best Practices](#testing-best-practices)
-- [Advanced Testing Techniques](#advanced-testing-techniques)
-- [Future Testing Opportunities](#future-testing-opportunities)
+- [Testing Guide for LLM-Finetuning-Playground](#testing-guide-for-llm-finetuning-playground)
+  - [Table of Contents](#table-of-contents)
+  - [Testing Philosophy](#testing-philosophy)
+  - [Current Test Suite](#current-test-suite)
+    - [1. Unit Tests (`test_model_loading.py`)](#1-unit-tests-test_model_loadingpy)
+    - [2. Functional Tests (`test_sentiment_model.py`)](#2-functional-tests-test_sentiment_modelpy)
+    - [3. Performance Tests (`test_sentiment_model.py`)](#3-performance-tests-test_sentiment_modelpy)
+  - [Running Tests](#running-tests)
+    - [Basic Test Commands](#basic-test-commands)
 
 ## Testing Philosophy
 
@@ -31,6 +33,7 @@ Our test suite consists of several types of tests:
 ### 1. Unit Tests (`test_model_loading.py`)
 
 Tests for properly loading models and tokenizers:
+
 - Tests that the model loading function works correctly
 - Verifies model architecture and configuration
 - Ensures tokenizers are properly initialized
@@ -38,6 +41,7 @@ Tests for properly loading models and tokenizers:
 ### 2. Functional Tests (`test_sentiment_model.py`)
 
 Tests for model behavior and predictions:
+
 - Verifies the model predicts expected sentiments on obvious examples
 - Tests model confidence scoring
 - Tests handling of edge cases (empty strings, very long text)
@@ -46,6 +50,7 @@ Tests for model behavior and predictions:
 ### 3. Performance Tests (`test_sentiment_model.py`)
 
 Tests for model performance metrics:
+
 - Verifies accuracy meets minimum thresholds
 - Tests inference speed requirements
 - Measures memory usage during inference
@@ -53,4 +58,3 @@ Tests for model performance metrics:
 ## Running Tests
 
 ### Basic Test Commands
-

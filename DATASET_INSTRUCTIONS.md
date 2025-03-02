@@ -5,6 +5,7 @@
 The recipe generation model requires the Recipe NLG dataset which must be manually downloaded:
 
 1. **Download the dataset**:
+
    ```bash
    # Download the dataset (if not already done)
    mkdir -p ~/Downloads/recipe_data
@@ -14,6 +15,7 @@ The recipe generation model requires the Recipe NLG dataset which must be manual
    ```
 
 2. **Prepare the dataset**:
+
    ```bash
    # Create a directory for the dataset
    mkdir -p ~/manual_data
@@ -23,6 +25,7 @@ The recipe generation model requires the Recipe NLG dataset which must be manual
    ```
 
 3. **Use the dataset**:
+
    ```bash
    # Specify the data directory when running commands
    python -m src.data.recipe_prepare_dataset --data_dir ~/manual_data

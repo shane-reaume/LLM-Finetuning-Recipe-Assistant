@@ -20,3 +20,4 @@ rouge-score==0.1.2  # For generation model evaluation
 sentencepiece==0.2.0  # Required by some tokenizers
 protobuf==5.26.1  # Compatibility with TensorBoard
 safetensors==0.5.3  # For improved model storage
+gradio==5.20.0  # For interactive model evaluation

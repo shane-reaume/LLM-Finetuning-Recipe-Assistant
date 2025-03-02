@@ -47,4 +47,3 @@ Evaluation on a balanced test set of 100 examples (50 positive, 50 negative):
 ### Direct Use
 
 This model can be used directly for sentiment analysis of text, particularly movie reviews:
-
