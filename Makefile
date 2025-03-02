@@ -9,17 +9,13 @@ setup:
 test-set:
 	python -m src.data.sentiment_create_test_set
 
-# Create balanced test set
-balanced-test-set:
-	python -m src.data.sentiment_create_balanced_test_set --output data/processed/balanced_test_examples.json
-
 # Train the model
 train:
 	python -m src.model.sentiment_train
 
 # Evaluate the model
 evaluate:
-	python -m src.model.evaluate --test_file data/processed/balanced_test_examples.json
+	python -m src.model.evaluate --test_file data/processed/sentiment_test_examples.json
 
 # Run the demo
 demo:

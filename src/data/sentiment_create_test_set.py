@@ -53,10 +53,6 @@ def create_test_set(config, num_examples=100):
             for example in balanced_subset
         ]
         
-        print(f"Created balanced test set with {len(test_examples)} examples "
-              f"({sum(ex['label'] for ex in test_examples)} positive, "
-              f"{len(test_examples) - sum(ex['label'] for ex in test_examples)} negative)")
-        
         return test_examples
         
     except Exception as e:

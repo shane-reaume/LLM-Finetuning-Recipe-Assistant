@@ -30,7 +30,7 @@ training:
 
 # Testing settings
 testing:
-  test_examples_file: "data/processed/test_examples.json"
+  test_examples_file: "data/processed/sentiment_test_examples.json"
   test_batch_size: 16
   evaluation_metrics:
     - accuracy
