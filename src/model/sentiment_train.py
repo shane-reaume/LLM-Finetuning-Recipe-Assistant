@@ -4,7 +4,7 @@ import torch
 from transformers import Trainer, TrainingArguments
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
-from src.model.model_loader import load_model
+from src.model.sentiment_model_loader import load_model
 from src.data.sentiment_dataset import load_and_preprocess_data
 
 def compute_metrics(eval_pred):
