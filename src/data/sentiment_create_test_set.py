@@ -2,7 +2,7 @@ import os
 import json
 import argparse
 from src.utils.config_utils import load_config
-from src.data.dataset import create_test_examples
+from src.data.sentiment_dataset import create_test_examples
 
 def main():
     """
