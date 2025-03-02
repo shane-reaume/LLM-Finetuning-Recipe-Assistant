@@ -30,7 +30,7 @@ This project demonstrates how to:
 
 ## 🧪 Testing & Quality Assurance Focus
 
-This project places special emphasis on testing methodologies for ML models. For a comprehensive guide to our testing approach, see [TESTME.md](TESTME.md).
+This project places special emphasis on testing methodologies for ML models. For a comprehensive guide to our testing approach, see [GETTING_STARTED_DEMO_1.md#testing-philosophy-and-methodology](GETTING_STARTED_DEMO_1.md#testing-philosophy-and-methodology).
 
 ### Test Types Implemented
 
@@ -120,7 +120,8 @@ LLM-Finetuning-Playground/
 │   └── test_recipe_model.py          # Tests for recipe generation
 ├── wandb/                            # Weights & Biases logging data
 ├── GETTING_STARTED.md                # Getting started guide
-├── TESTME.md                         # Testing methodology documentation
+├── GETTING_STARTED_DEMO_1.md         # Demo 1 guide with testing documentation
+├── GETTING_STARTED_DEMO_2.md         # Demo 2 guide
 ├── AI_TESTING_IDEAS.md               # Ideas for AI model testing
 ├── DATASET_INSTRUCTIONS.md           # Dataset preparation instructions
 ├── model_card.md                     # Model card template

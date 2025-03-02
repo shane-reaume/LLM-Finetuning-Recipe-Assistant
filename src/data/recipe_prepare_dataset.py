@@ -133,10 +133,10 @@ def prepare_generation_dataset(config, data_dir=None):
         print("1. Go to https://recipenlg.cs.put.poznan.pl/")
         print("2. Download the dataset zip file")
         print("3. Unzip the file and locate the full_dataset.csv file")
-        print("4. Create a directory to store the file (e.g., ~/manual_data)")
+        print("4. Create a directory to store the file (e.g., ~/recipe_manual_data)")
         print("5. Move full_dataset.csv to your created directory")
         print("6. Run this script again with --data_dir pointing to your directory:")
-        print("   python -m src.data.recipe_prepare_dataset --data_dir ~/manual_data")
+        print("   python -m src.data.recipe_prepare_dataset --data_dir ~/recipe_manual_data")
         return None, None
 
 def create_test_examples(config, data_dir=None, num_examples=10):
@@ -209,9 +209,10 @@ def create_test_examples(config, data_dir=None, num_examples=10):
         print("1. Go to https://recipenlg.cs.put.poznan.pl/")
         print("2. Download the dataset zip file")
         print("3. Unzip the file and locate the full_dataset.csv file")
-        print("4. Create a directory to store the file (e.g., ~/manual_data)")
+        print("4. Create a directory to store the file (e.g., ~/recipe_manual_data)")
         print("5. Move full_dataset.csv to your created directory")
-        print("6. Run this script again with --data_dir pointing to your directory")
+        print("6. Run this script again with --data_dir pointing to your directory:")
+        print("   python -m src.data.recipe_prepare_dataset --data_dir ~/recipe_manual_data")
         return []
 
 def main():

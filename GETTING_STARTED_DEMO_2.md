@@ -2,6 +2,15 @@
 
 **Recipe Generation** - Using a decoder model (TinyLlama) for text generation
 
+## 🌟 Overview
+
+This demo shows how to fine-tune a small language model to generate cooking recipes from ingredient lists. The process includes:
+
+1. **Dataset preparation** - Download and process the RecipeNLG dataset
+2. **Model fine-tuning** - Train TinyLlama with LoRA adapters
+3. **Evaluation** - Test the model's performance
+4. **Deployment** - Export to Ollama for local use
+
 ## 📋 Prerequisites
 
 - **Python 3.12.3 or later**
@@ -43,47 +52,72 @@ This project fine-tunes a small language model (TinyLlama) to generate recipes f
 Unlike the sentiment analysis project, the recipe generation model requires a dataset that must be manually downloaded:
 
 ```bash
-# Create download directory
-mkdir -p ~/Downloads/recipe_data
-cd ~/Downloads
+# Create directory for the dataset
+mkdir -p ~/recipe_manual_data
 
-# Download the Recipe NLG dataset
-wget https://recipenlg.blob.core.windows.net/recipenlg-misc/dataset.zip
-unzip dataset.zip -d ~/Downloads/recipe_data
+# Visit the official website and download the dataset
+# https://recipenlg.cs.put.poznan.pl/dataset
 
-# Create directory for the dataset and copy the file
-mkdir -p ~/manual_data
-cp ~/Downloads/recipe_data/full_dataset.csv ~/manual_data/
+# After downloading, place full_dataset.csv in your recipe_manual_data directory
 ```
+
+The dataset can be found at the official project website: [https://recipenlg.cs.put.poznan.pl/dataset](https://recipenlg.cs.put.poznan.pl/dataset)
+
+> **Note:** The dataset is approximately 600MB in size and contains over 2 million recipes.
 
 ### Step 2: Prepare the Dataset
 
-Generate a dataset of recipes for training:
+After downloading the dataset, prepare it for training:
 
 ```bash
 # Specify the data directory when running the command
-python -m src.data.recipe_prepare_dataset --data_dir ~/manual_data
+python -m src.data.recipe_prepare_dataset --data_dir ~/recipe_manual_data
 ```
 
-Alternatively, if you've set up the Makefile:
+Alternatively, use the Makefile:
 
 ```bash
-# Use the make command with the DATA_DIR variable
-make recipe-data DATA_DIR=~/manual_data
+# For the manually downloaded dataset
+make recipe-data CONFIG=config/text_generation.yaml DATA_DIR=~/recipe_manual_data
 ```
 
-This processes recipe data and saves it to `data/processed/recipe_dataset.json` and creates test examples at `data/processed/recipe_test_examples.json`.
+This processes recipe data and creates test examples at `data/processed/recipe_test_examples.json`. The configuration file (`config/text_generation.yaml`) controls the dataset processing parameters and output locations.
 
 ### Step 3: Train the Model
+
+Before running the full training process (which can take 2-4 hours), you may want to perform a quick sanity test to ensure everything is configured correctly:
+
+#### Option A: Run a Quick Sanity Test (Recommended)
+
+```bash
+# Run a minimal training session for testing purposes
+make recipe-train-test DATA_DIR=~/recipe_manual_data
+```
+
+This will:
+- Process only 50 training examples
+- Train for just 1% of an epoch
+- Use reduced sequence lengths
+- Complete in a few minutes rather than hours
+
+If the sanity test runs successfully, you can proceed with the full training.
+
+> **Troubleshooting Memory Issues**: If you encounter a "CUDA out of memory" error, your GPU may not have enough VRAM. Try these solutions:
+> 1. Edit `config/text_generation_sanity_test.yaml` and reduce `batch_size` to 1
+> 2. Further reduce `max_length` to 32
+> 3. Add `"offload_modules": true` to the LoRA configuration
+> 4. If errors persist, run the CPU version of the sanity test (very slow but works on any machine):
+>    ```bash
+>    make recipe-train-test-cpu DATA_DIR=~/recipe_manual_data
+>    ```
+
+#### Option B: Run Full Training
 
 Start the training process with a LoRA adapter:
 
 ```bash
-# Basic training command
-python -m src.model.recipe_train
-
-# Or with the Makefile
-make recipe-train
+# Run the full training process
+make recipe-train DATA_DIR=~/recipe_manual_data
 ```
 
 This will:
@@ -91,7 +125,7 @@ This will:
 - Download the TinyLlama base model
 - Set up the LoRA training configuration
 - Fine-tune the model on recipe generation
-- Save the model to `models/recipe`
+- Save the model to `models/recipe_assistant`
 
 Training typically takes 2-4 hours on a good GPU.
 
@@ -101,7 +135,7 @@ Assess the model's performance:
 
 ```bash
 # Basic evaluation command
-python -m src.model.recipe_evaluate
+python -m src.model.recipe_evaluate --config config/text_generation.yaml
 
 # Or with the Makefile
 make recipe-evaluate
@@ -121,7 +155,7 @@ Once your model is trained, you can use two different demo interfaces:
 #### CLI Demo
 ```bash
 # Run the command-line interface demo
-python -m src.recipe_demo --model_dir="models/recipe"
+python -m src.recipe_demo --model_dir="models/recipe_assistant"
 ```
 
 This demo provides a command-line interface where you can enter ingredients and get formatted recipes.
@@ -129,7 +163,7 @@ This demo provides a command-line interface where you can enter ingredients and 
 #### Web UI Demo
 ```bash
 # Run the web interface demo
-python -m src.recipe_web_demo --model_dir="models/recipe"
+python -m src.recipe_web_demo --model_dir="models/recipe_assistant"
 ```
 
 The web UI demo launches a Gradio interface in your browser, allowing for:
@@ -143,7 +177,13 @@ The web UI demo launches a Gradio interface in your browser, allowing for:
 If you have Ollama installed, you can export your model for easy local deployment:
 
 ```bash
-python -m src.recipe_export_to_ollama_utils --model_dir="models/recipe" --model_name="recipe-gen" --type="template"
+python -m src.model.recipe_export_to_ollama --model_dir="models/recipe_assistant" --model_name="recipe-gen"
+```
+
+Alternatively, use the Makefile target:
+
+```bash
+make recipe-export
 ```
 
 Then run your model with:
@@ -154,21 +194,58 @@ ollama run recipe-gen
 
 ## Project Structure for Recipe Generation
 
-- `config/text_generation_improved.yaml`: Configuration file
+- `config/text_generation.yaml`: Configuration file for training and evaluation
+- `config/text_generation_sanity_test.yaml`: Configuration for quick sanity testing
+- `config/recipe_prompt.txt`: Template for recipe formatting
+- `src/data/recipe_prepare_dataset.py`: Dataset preparation script
 - `src/model/recipe_train.py`: Training script
 - `src/model/recipe_evaluate.py`: Evaluation script
 - `src/recipe_demo.py`: CLI demo interface
 - `src/recipe_web_demo.py`: Web UI demo interface
-- `src/recipe_export_to_ollama_utils.py`: Ollama deployment utilities
+- `src/model/recipe_export_to_ollama.py`: Ollama deployment utilities
 - `tests/test_recipe_model.py`: Test suite
+- `data/processed/recipe_test_examples.json`: Test examples for evaluation
+- `models/recipe_assistant/`: Directory for the trained model checkpoints
 
 ## Customization
 
-You can modify the configuration files to change:
+You can modify the configuration files to change how the recipe generation model works:
 
-- `config/text_generation_improved.yaml`: Training parameters
-- `config/recipe_prompt.txt`: Template for recipe generation
-- Generation parameters in the demo scripts
+### Main Configuration File (`config/text_generation.yaml`):
+
+- **Data Settings**:
+  - `dataset_name`: The dataset to use (default: "recipe_nlg")
+  - `cache_dir`: Where processed data is stored (`./data/processed/generation`)
+  - `max_length`: Maximum sequence length (default: 512)
+  - `max_train_samples`: Optional limit on training examples (for testing)
+
+- **Model Settings**:
+  - `name`: Base model to fine-tune (default: "TinyLlama/TinyLlama-1.1B-Chat-v1.0")
+  - `save_dir`: Where to save the trained model (`./models/recipe_assistant`)
+
+- **Training Settings**:
+  - Learning parameters (batch size, learning rate, etc.)
+  - LoRA configuration (rank, alpha, target modules)
+  - `gradient_checkpointing`: Reduces memory usage but slows training
+  - `fp16`: Uses half-precision for better performance
+
+- **Testing Settings**:
+  - `test_examples_file`: Path to test examples (`data/processed/recipe_test_examples.json`)
+  - Generation parameters (temperature, top_p, etc.)
+
+### Sanity Test Configuration (`config/text_generation_sanity_test.yaml`):
+
+This is a minimal version of the main configuration designed for quick testing:
+  - Uses only 50 training examples
+  - Trains for just 1% of an epoch
+  - Uses much shorter sequence lengths (64 tokens)
+  - Employs memory optimizations like gradient checkpointing
+  - Uses a smaller batch size to reduce memory requirements
+  - Saves output to a different directory (`./models/recipe_assistant_test`)
+
+### Recipe Prompt Template (`config/recipe_prompt.txt`):
+
+You can edit this file to change how recipes are formatted during generation.
 
 Editing these files allows you to experiment with:
 
@@ -184,7 +261,7 @@ Editing these files allows you to experiment with:
 For better performance or offline use, you can merge the LoRA adapter with the base model:
 
 ```bash
-python -m src.model.recipe_merge_and_export_lora --base_model="TinyLlama/TinyLlama-1.1B-Chat-v1.0" --lora_model="models/recipe" --output_dir="models/recipe_merged"
+python -m src.model.recipe_merge_and_export_lora --base_model="TinyLlama/TinyLlama-1.1B-Chat-v1.0" --lora_model="models/recipe_assistant" --output_dir="models/recipe_merged"
 ```
 
 ### Performance Optimization
@@ -206,3 +283,18 @@ Once you're comfortable with the recipe generation project, consider:
 4. **Exploring model merging** - Learn more about model merging techniques
 5. **Trying our sentiment analysis demo** - Check GETTING_STARTED_DEMO_1.md
 
+## Testing
+
+Testing is a critical aspect of model development. The recipe generation model can be tested using:
+
+```bash
+# Run the recipe model tests
+pytest tests/test_recipe_model.py -v
+
+# Generate coverage report
+pytest --cov=src --cov-report=html
+```
+
+The HTML coverage report will be generated in the `htmlcov/` directory and can be viewed in a browser.
+
+For a comprehensive guide to our testing philosophy, methodology, and approach to ML model testing, please refer to the detailed testing documentation in [GETTING_STARTED_DEMO_1.md](GETTING_STARTED_DEMO_1.md#testing-philosophy-and-methodology).

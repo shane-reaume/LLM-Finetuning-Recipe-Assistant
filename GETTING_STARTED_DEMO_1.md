@@ -2,6 +2,24 @@
 
 **Sentiment Analysis** - Using an encoder model (DistilBERT) for classification
 
+## 🎓 Demo Model
+
+A trained version of this sentiment analysis model is available on Hugging Face:
+[https://huggingface.co/shane-reaume/imdb-sentiment-analysis](https://huggingface.co/shane-reaume/imdb-sentiment-analysis)
+
+You can try it directly in your browser or use it in your code with the Hugging Face API:
+
+```python
+from transformers import pipeline
+
+# Load the model
+sentiment = pipeline("sentiment-analysis", model="shane-reaume/imdb-sentiment-analysis")
+
+# Make predictions
+result = sentiment("I really enjoyed this movie!")
+print(result)
+```
+
 ## 📋 Common Prerequisites
 
 - **Python 3.12.3 or later**
@@ -96,14 +114,62 @@ The demo provides:
 - Confidence scores for each prediction
 - Performance metrics for batch processing
 
+### Step 5: Deploy to Hugging Face Hub
+
+Once you're satisfied with your model, you can share it with the community by deploying it to the Hugging Face Hub:
+
+```bash
+# Make sure you're logged in to Hugging Face
+huggingface-cli login
+
+# Deploy your model (replace YOUR_USERNAME with your Hugging Face username)
+python -m src.model.sentiment_publish --repo_name="YOUR_USERNAME/imdb-sentiment-analysis"
+
+# Alternatively, use the Makefile target
+make publish-sentiment REPO_NAME="YOUR_USERNAME/imdb-sentiment-analysis"
+```
+
+This will:
+- Upload your model and tokenizer to Hugging Face Hub
+- Create a model card with usage information
+- Make your model publicly accessible via the Hugging Face API
+
+After deployment, your model will be available at `https://huggingface.co/YOUR_USERNAME/imdb-sentiment-analysis` and can be used with the transformers library as shown in the demo section above.
+
+#### Customizing Your Model Card
+
+The project includes a template model card (`model_card.md`) that you can customize before deployment. This provides a more detailed presentation of your model on Hugging Face Hub.
+
+To customize and upload your model card:
+
+1. Edit the `model_card.md` file with your information:
+   - Update the developer information
+   - Fill in your performance metrics
+   - Modify example use cases
+
+2. After deploying your model, update the model card on Hugging Face Hub:
+
+```bash
+# Using the Python script directly
+python -m src.model.update_model_card --repo_name="YOUR_USERNAME/imdb-sentiment-analysis" --model_card="model_card.md"
+
+# Or using the Makefile target
+make update-model-card REPO_NAME="YOUR_USERNAME/imdb-sentiment-analysis"
+```
+
+This will replace the default README.md on your Hugging Face model page with your customized model card, providing users with comprehensive information about your model.
+
 ## Project Structure for Sentiment Analysis
 
 - `config/sentiment_analysis.yaml`: Configuration file
 - `src/model/sentiment_train.py`: Training script
 - `src/model/sentiment_inference.py`: Inference code
-- `src/model/sentiment_evaluate.py`: Evaluation code  
+- `src/model/sentiment_evaluate.py`: Evaluation code
+- `src/model/sentiment_publish.py`: Hugging Face deployment script
+- `src/model/update_model_card.py`: Model card updater for Hugging Face
 - `src/sentiment_demo.py`: Interactive demo
 - `tests/test_sentiment_model.py`: Test suite
+- `model_card.md`: Template for creating detailed model cards
 
 ## Customization
 
@@ -122,3 +188,81 @@ Once you're comfortable with the sentiment analysis project, consider:
 2. **Experimenting with different models** - Try other small models like Phi-2 or Gemma 2B
 3. **Implementing advanced testing** - Test for bias or concept drift
 4. **Extending to other tasks** - Try our recipe generation demo in GETTING_STARTED_DEMO_2.md
+
+## Testing Philosophy and Methodology
+
+Testing machine learning models is fundamentally different from testing traditional software:
+
+1. **Non-deterministic outputs**: ML models may produce slightly different results even with the same inputs
+2. **Performance vs correctness**: We test for acceptable performance rather than 100% correctness
+3. **Robustness testing**: We need to test how models handle edge cases and adversarial inputs
+4. **Concept drift**: Models can degrade over time as real-world data changes
+5. **Data quality impacts**: Testing must account for data biases and quality issues
+
+### Test Suite Overview
+
+Our test suite consists of several types of tests:
+
+#### 1. Unit Tests (`test_model_loading.py`)
+
+Tests for properly loading models and tokenizers:
+
+- Tests that the model loading function works correctly
+- Verifies model architecture and configuration
+- Ensures tokenizers are properly initialized
+
+#### 2. Functional Tests (`test_sentiment_model.py`)
+
+Tests for model behavior and predictions:
+
+- Verifies the model predicts expected sentiments on obvious examples
+- Tests model confidence scoring
+- Tests handling of edge cases (empty strings, very long text)
+- Tests batch processing capabilities
+
+#### 3. Performance Tests (`test_sentiment_model.py`)
+
+Tests for model performance metrics:
+
+- Verifies accuracy meets minimum thresholds
+- Tests inference speed requirements
+- Measures memory usage during inference
+
+### Running Tests
+
+#### Basic Test Commands
+
+```bash
+# Run all tests
+pytest
+
+# Run with verbose output
+pytest -v
+
+# Run a specific test file
+pytest tests/test_sentiment_model.py
+
+# Run a specific test class
+pytest tests/test_sentiment_model.py::TestModelPrediction
+
+# Run a specific test method
+pytest tests/test_sentiment_model.py::TestModelPrediction::test_single_prediction
+```
+
+#### Code Coverage
+
+We track test coverage to ensure our test suite adequately tests the entire codebase:
+
+```bash
+# Generate coverage report
+pytest --cov=src
+
+# Generate HTML coverage report (output to htmlcov/ directory)
+pytest --cov=src --cov-report=html
+
+# Open the coverage report in your browser
+open htmlcov/index.html  # On macOS
+xdg-open htmlcov/index.html  # On Linux
+```
+
+Coverage reports help identify untested or undertested parts of the codebase that may require additional testing.
