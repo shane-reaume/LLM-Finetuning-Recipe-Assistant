@@ -68,52 +68,94 @@ here we will keep notes on the project to assist with the direction of the proje
 ```yaml
 LLM-Finetuning-Playground/
 ├── config/
-│   └── default.yaml            # Configuration file (training parameters, paths, etc.)
+│   ├── default.yaml                  # Base configuration file
+│   ├── sentiment_analysis.yaml       # Sentiment analysis training configuration
+│   ├── text_generation.yaml          # Recipe generation base configuration
+│   ├── text_generation_small.yaml    # Recipe generation with smaller model settings
+│   ├── text_generation_improved.yaml # Improved recipe generation configuration
+│   └── recipe_prompt.txt             # Text prompt template for recipe generation
 ├── data/
-│   ├── raw/                    # Original/raw datasets
-│   └── processed/              # Preprocessed/tokenized data files
-├── notebooks/                  # Jupyter notebooks for exploration and quick experiments
+│   ├── raw/                          # Original datasets for both projects
+│   ├── processed/                    # Preprocessed data files
+│   └── img/                          # Images for documentation
+├── docs/                             # Documentation files
+├── logs/                             # Training and evaluation logs
+├── models/                           # Saved model checkpoints
+│   ├── sentiment/                    # Sentiment analysis model
+│   └── recipe/                       # Recipe generation model
+├── notebooks/                        # Jupyter notebooks for exploration
+├── scripts/                          # Utility scripts for automation
 ├── src/
-│   ├── __init__.py
-│   ├── data/                   # Data loading and preprocessing code
-│   │   ├── __init__.py
-│   │   └── dataset.py          # Functions/classes to load and process your dataset
-│   ├── model/                  # Model-related code
-│   │   ├── __init__.py
-│   │   ├── model_loader.py     # Code to load pretrained models and tokenizers
-│   │   ├── train.py            # Training script (fine-tuning loop, Trainer setup, etc.)
-│   │   └── inference.py        # Inference code to load and run your fine-tuned model
-│   └── utils/                  # Utility functions (logging, configuration parsing, etc.)
-│       ├── __init__.py
-│       └── config_utils.py     # Functions to read configuration files (e.g., YAML parser)
-├── tests/                      # Automated tests for QA
-│   ├── __init__.py
-│   ├── test_dataset.py         # Unit tests for data processing functions
-│   ├── test_model_loading.py   # Tests for loading models/tokenizers correctly
-│   └── test_training.py        # Tests for parts of the training loop (e.g., with dummy data)
-├── requirements.txt            # List of required Python packages
-├── setup.py                    # (Optional) Packaging script if you plan to distribute your code
-└── README.md                   # Project overview, installation instructions, etc.
+│   ├── data/                         # Data loading and preprocessing code
+│   │   ├── dataset.py                # Base dataset functions
+│   │   ├── sentiment_create_test_set.py       # Test set creation for sentiment analysis
+│   │   ├── sentiment_create_balanced_test_set.py  # Balanced test set for sentiment
+│   │   ├── prepare_gen_dataset.py    # Data preparation for text generation
+│   │   └── recipe_prepare_dataset.py # Recipe dataset preparation
+│   ├── model/                        # Model-related code
+│   │   ├── generation/               # Additional generation model components
+│   │   ├── model_loader.py           # Code to load models and tokenizers
+│   │   ├── sentiment_train.py        # Sentiment model training
+│   │   ├── sentiment_inference.py    # Sentiment model inference
+│   │   ├── sentiment_evaluate.py     # Sentiment model evaluation
+│   │   ├── recipe_train.py           # Recipe model training
+│   │   ├── recipe_evaluate.py        # Recipe model evaluation
+│   │   ├── recipe_export_to_ollama.py # Export recipe model to Ollama
+│   │   ├── merge_and_export_lora.py  # Merge LoRA adapters and export
+│   │   ├── publish.py                # Publish models to Hugging Face Hub
+│   │   └── update_model_card.py      # Generate/update model cards
+│   ├── utils/                        # Utility functions
+│   │   ├── config_utils.py           # Configuration utilities
+│   │   ├── recipe_formatter.py       # Format recipe outputs
+│   │   ├── recipe_generator.py       # Recipe generation utilities
+│   │   └── recipe_prompts.py         # Recipe prompt templates
+│   ├── demo.py                       # Sentiment analysis demo
+│   ├── recipe_demo.py                # Recipe generation CLI demo
+│   ├── recipe_web_demo.py            # Recipe generation web UI demo
+│   ├── direct_recipe_test.py         # Direct testing of recipe generation
+│   ├── ollama_simple_export.py       # Simple Ollama export utility
+│   ├── export_to_ollama_simple.py    # Alternative Ollama export
+│   └── ultra_simple_export.py        # Simplified model export
+├── tests/                            # Automated tests
+│   ├── conftest.py                   # Pytest configurations
+│   ├── test_sentiment_model.py       # Tests for sentiment analysis
+│   └── test_recipe_model.py          # Tests for recipe generation
+├── wandb/                            # Weights & Biases logging data
+├── GETTING_STARTED.md                # Getting started guide
+├── TESTME.md                         # Testing methodology documentation
+├── AI_TESTING_IDEAS.md               # Ideas for AI model testing
+├── DATASET_INSTRUCTIONS.md           # Dataset preparation instructions
+├── model_card.md                     # Model card template
+├── requirements.txt                  # Project dependencies
+├── setup_env.sh                      # Environment setup script
+├── Makefile                          # Automation of common tasks
+└── LICENSE                           # Project license
 ```
 
 ## Explanation:
 
-`config/`
-Store configuration files (using YAML, JSON, or INI formats) so that you can change hyperparameters, file paths, and other settings without modifying the code. Tools like Hydra or OmegaConf can help manage configurations.
+This project is organized into two main applications:
 
-`data/`
-Keep your raw data separate from processed data. This makes it easier to rerun preprocessing and avoid accidental data corruption.
+1. **Sentiment Analysis (DistilBERT)**: A classification task that analyzes movie reviews
+   - Training: `src/model/sentiment_train.py`
+   - Inference: `src/model/sentiment_inference.py`  
+   - Demo: `src/demo.py`
+   - Tests: `tests/test_sentiment_model.py`
 
-`src/`
-Divide the core functionality:
+2. **Recipe Generation (TinyLlama)**: A text generation task that creates recipes
+   - Training: `src/model/recipe_train.py`
+   - Evaluation: `src/model/recipe_evaluate.py`
+   - Demos: 
+     - CLI: `src/recipe_demo.py`
+     - Web UI: `src/recipe_web_demo.py`
+   - Tests: `tests/test_recipe_model.py`
+   - Deployment: Various export utilities for Ollama
 
-- `data/`: Handle data loading, preprocessing, and any dataset manipulation.
-- `model/`: Code for loading the Hugging Face model, setting up the training loop (using Trainer), and handling inference.
-- `utils/`: General helper functions (e.g., reading config files, logging utilities).
-- `tests/`
-Write tests (using frameworks like pytest or Python’s built-in unittest) for each module. For instance, test that your data preprocessing functions work correctly with sample inputs, or that your model can load a checkpoint properly.
-- `notebooks/`
-Use these for rapid prototyping or visual analysis of training runs (e.g., to explore sample outputs, loss curves, etc.).
+The project uses:
+- **YAML configurations** in the `config/` directory for model parameters
+- **Weights & Biases** for experiment tracking
+- **Pytest** for automated testing
+- **Hugging Face** and **Ollama** for model deployment
 
 ## Integrations
 Here are some integrations and tools that can be used for free or on low-cost/free tiers:
