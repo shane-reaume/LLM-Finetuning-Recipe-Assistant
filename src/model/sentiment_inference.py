@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 import argparse
 from transformers import pipeline
 from src.utils.config_utils import load_config
-from src.model.model_loader import load_trained_model
+from src.model.sentiment_model_loader import load_trained_model
 
 class SentimentClassifier:
     """Class for sentiment classification inference and evaluation"""

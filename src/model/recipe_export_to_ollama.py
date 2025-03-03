@@ -4,94 +4,93 @@ import argparse
 import json
 import subprocess
 import shutil
+from pathlib import Path
+from datetime import datetime
 
 from src.utils.config_utils import load_config
 
-def export_model_to_ollama(model_dir, model_name, description=None):
+def export_model_to_ollama(model_dir, name, version=None, replace=False):
     """
-    Export a fine-tuned text generation model to Ollama
+    Export a fine-tuned model to Ollama
     
     Args:
-        model_dir (str): Path to the fine-tuned model directory
-        model_name (str): Name to give the model in Ollama
-        description (str, optional): Model description
+        model_dir (str): Path to the model directory
+        name (str): Name to use for the Ollama model
+        version (str, optional): Version string (e.g., "v1", "v2")
+        replace (bool): Whether to replace an existing model
     """
-    print(f"Preparing to export model from {model_dir} to Ollama as '{model_name}'")
+    # Validate model directory
+    if not os.path.exists(model_dir):
+        raise ValueError(f"Model directory {model_dir} not found")
     
-    # Load model info
-    model_info_path = os.path.join(model_dir, "model_info.json")
-    if os.path.exists(model_info_path):
-        with open(model_info_path, 'r') as f:
-            model_info = json.load(f)
+    # Generate versioned name if specified
+    if version:
+        full_name = f"{name}-{version}"
     else:
-        model_info = {}
-    
-    # Create temporary directory for Ollama model files
-    ollama_dir = os.path.join(os.getcwd(), "ollama_export")
-    os.makedirs(ollama_dir, exist_ok=True)
-    
-    # Create Modelfile for Ollama
-    base_model = model_info.get("model_name", "tinyllama:latest").split('/')[-1]
-    if ":" not in base_model:
-        base_model += ":latest"
-    
-    modelfile_path = os.path.join(ollama_dir, "Modelfile")
-    with open(modelfile_path, 'w') as f:
-        f.write(f"FROM {base_model}\n\n")
+        full_name = name
         
-        # Add description
-        if description:
-            f.write(f"DESCRIPTION {description}\n\n")
-        elif model_info.get("prompt_template"):
-            f.write(f"DESCRIPTION Fine-tuned {base_model} with a custom prompt template\n\n")
-        
-        # Add system prompt based on the original prompt template
-        if model_info.get("prompt_template"):
-            system_prompt = f"You are a helpful assistant that specializes in generating recipes. " \
-                          f"When provided with ingredients, create delicious recipes using them."
-            f.write(f'SYSTEM """{system_prompt}"""\n\n')
-        
-        # Add parameter settings
-        f.write("PARAMETER temperature 0.7\n")
-        f.write("PARAMETER top_p 0.9\n")
-        f.write("PARAMETER stop \"\\n\\n\"\n\n")
-        
-        # Add the model path (for LoRA adapters)
-        if model_info.get("lora_enabled", False):
-            adapter_path = os.path.join(model_dir, "adapter_model.bin")
-            if os.path.exists(adapter_path):
-                # Copy adapter to the Ollama directory
-                shutil.copy(adapter_path, os.path.join(ollama_dir, "adapter_model.bin"))
-                f.write("ADAPTER adapter_model.bin\n\n")
-            else:
-                print(f"Warning: LoRA adapter file not found at {adapter_path}")
+    # Check if model already exists in Ollama
+    result = subprocess.run(["ollama", "list"], capture_output=True, text=True)
     
-    print(f"Created Modelfile at {modelfile_path}")
-    print("\nTo import the model into Ollama:")
-    print(f"1. Navigate to: {ollama_dir}")
-    print(f"2. Run: ollama create {model_name} -f Modelfile")
-    print(f"3. Then use: ollama run {model_name}")
+    if full_name in result.stdout and not replace:
+        raise ValueError(f"Model {full_name} already exists in Ollama. Use --replace to overwrite.")
+    
+    # Create a temporary Modelfile with proper syntax
+    modelfile_content = (
+        f"FROM {model_dir}\n"
+        "PARAMETER temperature 0.7\n"
+        "PARAMETER top_p 0.9\n"
+        "PARAMETER top_k 40\n"
+        "PARAMETER repetition_penalty 1.2\n"
+        "TEMPLATE <<EOT\n"
+        "Create a recipe using these ingredients: {{ingredients}}\n"
+        "EOT\n"
+    )
+    
+    # Write Modelfile
+    with open("Modelfile", "w") as f:
+        f.write(modelfile_content)
+    
+    try:
+        # Build the Ollama model
+        print(f"Building Ollama model {full_name}...")
+        subprocess.run(["ollama", "create", full_name, "-f", "Modelfile"], check=True)
+        print(f"Successfully exported model to Ollama as '{full_name}'")
+        
+        # Save metadata for tracking
+        metadata = {
+            "original_model": model_dir,
+            "ollama_name": full_name,
+            "exported_at": datetime.now().isoformat(),
+            "version": version
+        }
+        
+        metadata_dir = os.path.join(os.path.dirname(model_dir), "ollama_exports")
+        os.makedirs(metadata_dir, exist_ok=True)
+        
+        with open(os.path.join(metadata_dir, f"{full_name}_metadata.json"), "w") as f:
+            json.dump(metadata, f, indent=2)
+            
+        print(f"To use the model, run: ollama run {full_name}")
+        
+    finally:
+        # Clean up temporary Modelfile
+        if os.path.exists("Modelfile"):
+            os.remove("Modelfile")
 
 def main():
-    parser = argparse.ArgumentParser(description="Export fine-tuned model to Ollama")
-    parser.add_argument("--model_dir", type=str, default=None, 
-                        help="Path to the fine-tuned model directory")
-    parser.add_argument("--config", type=str, default="config/text_generation.yaml",
-                        help="Path to configuration file")
+    parser = argparse.ArgumentParser(description="Export a fine-tuned model to Ollama")
+    parser.add_argument("--model_dir", type=str, default="./models/recipe_assistant",
+                       help="Path to the model directory")
     parser.add_argument("--name", type=str, default="recipe-assistant",
-                        help="Name to give the model in Ollama")
-    parser.add_argument("--description", type=str, default=None,
-                        help="Optional description for the model")
+                       help="Name to use for the Ollama model")
+    parser.add_argument("--version", type=str, 
+                       help="Optional version string (e.g., 'v1', 'v2')")
+    parser.add_argument("--replace", action="store_true",
+                       help="Replace existing model if it exists")
     args = parser.parse_args()
     
-    # Load configuration
-    config = load_config(args.config)
-    
-    # Get model directory from args or config
-    model_dir = args.model_dir if args.model_dir else config["model"]["save_dir"]
-    
-    # Export model
-    export_model_to_ollama(model_dir, args.name, args.description)
+    export_model_to_ollama(args.model_dir, args.name, args.version, args.replace)
 
 if __name__ == "__main__":
     main()
