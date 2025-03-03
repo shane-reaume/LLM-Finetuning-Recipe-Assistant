@@ -1,4 +1,4 @@
-.PHONY: setup test train evaluate demo clean coverage publish-sentiment update-model-card recipe-data recipe-train recipe-train-low-memory recipe-evaluate recipe-demo recipe-export recipe-export-versioned recipe-train-test recipe-train-test-cpu
+.PHONY: setup test train evaluate demo clean coverage publish-sentiment update-model-card recipe-data recipe-train recipe-train-low-memory recipe-train-medium-memory recipe-evaluate recipe-demo recipe-export recipe-export-versioned recipe-train-test recipe-train-test-cpu
 
 # Setup environment
 setup:
@@ -80,6 +80,14 @@ recipe-train-low-memory:
 		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config $$CONFIG_PATH; \
 	else \
 		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config $$CONFIG_PATH --data_dir $(DATA_DIR); \
+	fi
+
+recipe-train-medium-memory:
+	@if [ -z "$(DATA_DIR)" ]; then \
+		echo "Warning: DATA_DIR not specified. The script may fail if dataset preparation hasn't been completed."; \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/text_generation_medium_memory.yaml; \
+	else \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/text_generation_medium_memory.yaml --data_dir $(DATA_DIR); \
 	fi
 
 recipe-evaluate:
