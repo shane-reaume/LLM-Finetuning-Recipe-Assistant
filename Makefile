@@ -82,12 +82,12 @@ recipe-train-low-memory:
 		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config $$CONFIG_PATH --data_dir $(DATA_DIR); \
 	fi
 
-recipe-train-medium-memory:
+recipe-train-optimized:
 	@if [ -z "$(DATA_DIR)" ]; then \
 		echo "Warning: DATA_DIR not specified. The script may fail if dataset preparation hasn't been completed."; \
-		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/text_generation_medium_memory.yaml; \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/text_generation_optimized.yaml; \
 	else \
-		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/text_generation_medium_memory.yaml --data_dir $(DATA_DIR); \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/text_generation_optimized.yaml --data_dir $(DATA_DIR); \
 	fi
 
 recipe-evaluate:

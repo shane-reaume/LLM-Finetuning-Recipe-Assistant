@@ -11,8 +11,14 @@ import yaml
 import argparse
 from pathlib import Path
 import math
+from typing import Dict, List, Any, Optional, Union
 
 # Try importing GPU-related libraries
+HAS_TORCH = False
+HAS_NVML = False
+torch = None
+nvml = None
+
 try:
     import torch
     HAS_TORCH = True
@@ -25,7 +31,7 @@ try:
 except ImportError:
     HAS_NVML = False
 
-def get_system_info():
+def get_system_info() -> Dict[str, Any]:
     """Gather system hardware information"""
     info = {
         "cpu": {
@@ -41,22 +47,37 @@ def get_system_info():
     }
     
     # Check for GPU availability
-    if HAS_TORCH and torch.cuda.is_available():
+    if HAS_TORCH and torch is not None and torch.cuda.is_available():
         info["gpu"]["available"] = True
         info["gpu"]["count"] = torch.cuda.device_count()
         
-        if HAS_NVML:
+        if HAS_NVML and nvml is not None:
             try:
                 nvml.nvmlInit()
                 for i in range(info["gpu"]["count"]):
                     handle = nvml.nvmlDeviceGetHandleByIndex(i)
+                    mem_info = nvml.nvmlDeviceGetMemoryInfo(handle)
+                    # Handle different return types from nvmlDeviceGetMemoryInfo
+                    try:
+                        # Try to get total memory in bytes and convert to GB
+                        if isinstance(mem_info, (int, float)):
+                            memory_bytes = int(mem_info)
+                        elif hasattr(mem_info, 'total'):
+                            memory_bytes = mem_info.total  # type: ignore
+                        else:
+                            memory_bytes = 0
+                            
+                        memory_gb = round(memory_bytes / (1024 ** 3), 2)
+                    except Exception:
+                        memory_gb = None
+                        
                     device_info = {
                         "name": nvml.nvmlDeviceGetName(handle),
-                        "memory_gb": round(nvml.nvmlDeviceGetMemoryInfo(handle).total / (1024 ** 3), 2)
+                        "memory_gb": memory_gb
                     }
                     info["gpu"]["devices"].append(device_info)
                 nvml.nvmlShutdown()
-            except:
+            except Exception:
                 # Fall back to torch info if NVML fails
                 for i in range(info["gpu"]["count"]):
                     device_info = {
@@ -97,9 +118,9 @@ def estimate_model_size(model_name):
         # Default estimate
         return 1.1  # Assume TinyLlama size if unknown
 
-def benchmark_gpu(model_name):
+def benchmark_gpu(model_name: str) -> Optional[Dict[str, Any]]:
     """Simple GPU benchmark for model loading and inference"""
-    if not HAS_TORCH or not torch.cuda.is_available():
+    if not HAS_TORCH or torch is None or not torch.cuda.is_available():
         return None
     
     results = {
@@ -113,13 +134,28 @@ def benchmark_gpu(model_name):
     
     # Get GPU memory
     gpu_memory = 0
-    if HAS_NVML:
+    if HAS_NVML and nvml is not None:
         try:
             nvml.nvmlInit()
             handle = nvml.nvmlDeviceGetHandleByIndex(0)  # Use primary GPU
-            gpu_memory = nvml.nvmlDeviceGetMemoryInfo(handle).total / (1024 ** 3)
+            mem_info = nvml.nvmlDeviceGetMemoryInfo(handle)
+            
+            # Handle different return types from nvmlDeviceGetMemoryInfo
+            try:
+                # Try to get total memory in bytes and convert to GB
+                if isinstance(mem_info, (int, float)):
+                    memory_bytes = int(mem_info)
+                elif hasattr(mem_info, 'total'):
+                    memory_bytes = mem_info.total  # type: ignore
+                else:
+                    memory_bytes = 0
+                    
+                gpu_memory = memory_bytes / (1024 ** 3)
+            except Exception:
+                gpu_memory = 0
+                
             nvml.nvmlShutdown()
-        except:
+        except Exception:
             pass
     
     if gpu_memory == 0:
@@ -150,21 +186,23 @@ def benchmark_gpu(model_name):
         # Set gradient accumulation to achieve effective batch size of ~32
         results["gradient_accumulation"] = max(1, 32 // results["recommended_batch_size"])
         
-        # Determine best precision
-        if "A100" in str(torch.cuda.get_device_name(0)) or "H100" in str(torch.cuda.get_device_name(0)):
-            results["recommended_precision"] = "bf16"
-        elif "V100" in str(torch.cuda.get_device_name(0)) or "T4" in str(torch.cuda.get_device_name(0)):
-            results["recommended_precision"] = "fp16"
-        else:
-            # For older GPUs, recommend fp16 or fp32 based on memory
-            if gpu_memory > 16:
+        if torch is not None:
+            # Determine best precision
+            device_name = str(torch.cuda.get_device_name(0))
+            if "A100" in device_name or "H100" in device_name:
+                results["recommended_precision"] = "bf16"
+            elif "V100" in device_name or "T4" in device_name:
                 results["recommended_precision"] = "fp16"
             else:
-                results["recommended_precision"] = "fp32"
+                # For older GPUs, recommend fp16 or fp32 based on memory
+                if gpu_memory >= 32:
+                    results["recommended_precision"] = "fp32"
+                else:
+                    results["recommended_precision"] = "fp16"
                 
     return results
 
-def generate_recommended_config(sys_info, config_path):
+def generate_recommended_config(sys_info: Dict[str, Any], config_path: str) -> tuple:
     """Generate recommended config based on hardware and existing config"""
     # Load existing config
     with open(config_path, 'r') as f:
@@ -180,6 +218,7 @@ def generate_recommended_config(sys_info, config_path):
     }
     
     # If GPU is available, get detailed recommendations
+    gpu_benchmark = None
     if recommendations["use_gpu"]:
         gpu_benchmark = benchmark_gpu(model_name)
         if gpu_benchmark:
@@ -187,7 +226,9 @@ def generate_recommended_config(sys_info, config_path):
     
     # Memory-based dataset size recommendations
     system_memory_gb = sys_info["cpu"]["memory_gb"]
-    if system_memory_gb < 16:
+    if system_memory_gb < 8:
+        recommendations["max_train_samples"] = 5000
+    elif system_memory_gb < 16:
         recommendations["max_train_samples"] = 10000
     elif system_memory_gb < 32:
         recommendations["max_train_samples"] = 50000
@@ -196,8 +237,8 @@ def generate_recommended_config(sys_info, config_path):
     updated_config = config.copy()
     
     # Update training settings
-    if recommendations["use_gpu"]:
-        if gpu_benchmark and gpu_benchmark["can_load_model"]:
+    if recommendations["use_gpu"] and gpu_benchmark is not None:
+        if gpu_benchmark.get("can_load_model", False):
             updated_config["training"]["batch_size"] = gpu_benchmark["recommended_batch_size"]
             updated_config["training"]["gradient_accumulation_steps"] = gpu_benchmark["gradient_accumulation"]
             

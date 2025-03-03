@@ -66,6 +66,7 @@ This will:
 - Create necessary project directories
 
 ### Step 2: Activate the virtual environment
+
 (if not already activated by the script)
 
 ```bash
@@ -110,9 +111,25 @@ Alternatively, use the Makefile:
 make recipe-data CONFIG=config/text_generation.yaml DATA_DIR=~/recipe_manual_data
 ```
 
-This processes recipe data and creates test examples at `data/processed/recipe_test_examples.json`. The configuration file (`config/text_generation.yaml`) controls the dataset processing parameters and output locations.
+This processes recipe data and creates test examples at `data/processed/recipe_test_examples.json`. 
+
+The configuration file (`config/text_generation.yaml`) controls the dataset processing parameters and output locations.
 
 ### Step 3: Train the Model
+
+#### Check your hardware configuration
+
+You can get a report on your operating system and hardware configuration by running the `config_optimizer.py` script to see if it is optimized for training a model of this size:
+
+```bash
+python scripts/config_optimizer.py --config config/text_generation.yaml
+```
+
+If you want to optimize the configuration for your hardware, you can run the `config_optimizer.py` script with the `-o` flag to save the optimized configuration to a new file:
+
+```bash
+python scripts/config_optimizer.py --config config/text_generation_optimized.yaml --update
+```
 
 Before running the full training process (which can take 2-4 hours), you may want to perform a quick sanity test to ensure everything is configured correctly:
 
@@ -124,6 +141,7 @@ make recipe-train-test DATA_DIR=~/recipe_manual_data
 ```
 
 This will:
+
 - Process only 30 training examples
 - Train for just 1% of an epoch
 - Use reduced sequence lengths (32 tokens)
@@ -155,7 +173,16 @@ If the sanity test runs successfully, you can proceed with the full training.
 > **Option 4: Cloud GPUs**
 > Consider using a cloud GPU service like Google Colab, Kaggle, or AWS with more VRAM.
 
-#### Option B: Run Full Training
+#### Option B: Run Full Training with Optimized Configuration
+
+Start the training process with a LoRA adapter:
+
+```bash
+# Run the full training process
+make recipe-train-optimized DATA_DIR=~/recipe_manual_data
+```
+
+#### Option C: Run Full Training with Original Configuration
 
 Start the training process with a LoRA adapter:
 
