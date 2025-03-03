@@ -1,6 +1,6 @@
 {
   "model_name": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
-  "max_length": 64,
+  "max_length": 32,
   "prompt_template": "Create a recipe with these ingredients: {ingredients}\n\n",
   "lora_enabled": true
 }
