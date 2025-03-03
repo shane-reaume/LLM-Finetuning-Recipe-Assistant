@@ -19,8 +19,8 @@ model:
 
 # Training settings
 training:
-  batch_size: 8
-  gradient_accumulation_steps: 4  # Effective batch size of 32
+  batch_size: 2
+  gradient_accumulation_steps: 32  # Effective batch size of 64
   num_train_epochs: 8
   learning_rate: 2.0e-5
   weight_decay: 0.01
@@ -30,7 +30,7 @@ training:
   logging_dir: "./logs/recipe_assistant"
   evaluation_strategy: "steps"
   eval_steps: 500
-  fp32: true
+  fp16: true
   max_train_samples: 10000  # Limit dataset size for memory-constrained environments
   lora:  # Use PEFT with LoRA for efficient fine-tuning
     enabled: true
