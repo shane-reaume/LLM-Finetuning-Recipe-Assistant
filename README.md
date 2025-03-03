@@ -6,11 +6,42 @@ A beginner-friendly project for fine-tuning, testing, and deploying language mod
 
 This project demonstrates how to:
 
-- Fine-tune language models for different types of tasks
-- Implement proper testing and evaluation methodologies 
+- Fine-tune language models for different types of tasks (classification and generation)
+- Implement proper testing and evaluation methodologies for LLMs
 - Create evaluation metrics and test sets for consistent model testing
 - Deploy models to different platforms (Hugging Face Hub, Ollama)
 - Create interactive demos for testing models
+
+## 📋 System Requirements
+
+- **Python 3.12.3 or higher**
+- **Git** for version control
+- **GPU with VRAM**:
+  - 8GB+ recommended for sentiment analysis
+  - 8GB+ required for recipe generation (16GB+ preferred)
+  - CPU-only training is possible but very slow
+- **Basic Python knowledge** (No ML experience required)
+- **Platform Compatibility**:
+  - ✅ **Windows 11**: Using WSL with Ubuntu
+  - ✅ **Linux**: Confirmed on Debian-based distributions like Linux Mint and Ubuntu
+  - ❌ **macOS**: Not currently compatible due to PyTorch version requirements
+    - Project uses PyTorch 2.6.0, while macOS is limited to PyTorch 2.2.0
+    - May work with modifications to `requirements.txt` but not officially supported
+
+## 🔧 Initial Setup
+
+```bash
+git clone https://github.com/your-repo/LLM-Finetuning-Playground.git
+cd LLM-Finetuning-Playground
+chmod +x setup_env.sh
+./setup_env.sh
+```
+
+This script will:
+
+- Create a virtual environment
+- Install all dependencies
+- Create necessary project directories
 
 ## 🤖 Demo Projects
 
@@ -18,15 +49,23 @@ This project demonstrates how to:
 
 ![Sentiment Analysis Demo](data/img/sentiment-analysis-demo.png)
 
-- Fine-tunes a **DistilBERT** model to classify movie reviews as positive or negative
-- Emphasizes classification metrics (accuracy, F1 score, precision, recall)
-- Deployed to **Hugging Face Hub**
+- **Model Architecture**: Fine-tuning a **DistilBERT** encoder model for binary text classification
+- **Training Methodology**: Binary classification on the IMDB movie reviews dataset
+- **Key Techniques**: Transfer learning, mixed-precision training, supervised fine-tuning
+- **Evaluation Metrics**: Accuracy, F1 score, precision, recall
+- **Deployment Target**: Published to **Hugging Face Hub**
+
+→ [**Get Started with Sentiment Analysis Demo**](GETTING_STARTED_DEMO_1.md)
 
 ### 2. Recipe Assistant (Text Generation)
 
-- Fine-tunes a **TinyLlama** model to generate recipes from ingredient lists
-- Focuses on generation quality and coherence
-- Deployed to **Ollama**
+- **Model Architecture**: Fine-tuning a **TinyLlama** (1.1B parameters) with LoRA adapters
+- **Training Methodology**: Instruction fine-tuning on the RecipeNLG dataset
+- **Key Techniques**: Parameter-efficient training, gradient checkpointing, memory optimizations
+- **Memory-Optimized Options**: Choose from standard, medium, or low-memory training configurations
+- **Deployment Target**: Exported to **Ollama** for local inference
+
+→ [**Get Started with Recipe Generation Demo**](GETTING_STARTED_DEMO_2.md)
 
 ## 🧪 Testing & Quality Assurance Focus
 
@@ -39,101 +78,52 @@ This project places special emphasis on testing methodologies for ML models. For
 - **Performance tests**: Ensuring the model meets accuracy and speed requirements
 - **Balanced test sets**: Creating test data with equal class distribution
 - **High-confidence evaluations**: Analyzing model confidence in predictions
+- **Memory tests**: Ensuring models can run on consumer hardware
 
 ### Testing Principles
 
 - **Reproducibility**: Tests use fixed test sets to ensure consistent evaluation
 - **Isolation**: Components are tested independently
 - **Metrics tracking**: F1 score, precision, recall, and accuracy are tracked
-- **Performance benchmarking**: Measuring inference speed
-
-## 🚀 Getting Started
-
-See the [GETTING_STARTED.md](GETTING_STARTED.md) file for detailed instructions on:
-
-- Setting up your environment
-- Training your first model
-- Running the test suite
-- Using the interactive demo
+- **Performance benchmarking**: Measuring inference speed and memory usage
 
 ## 📊 Example Results
 
-After training, you'll be able to analyze sentiment in text:
+### Sentiment Analysis
 
-# Project WIP Notes
-here we will keep notes on the project to assist with the direction of the project for myself and for any AI agent assistance so they have a high level of the project without crawling the file directory.
+After training the sentiment analysis model, you'll be able to classify text sentiment:
 
-## Project Structure
+```python
+from transformers import pipeline
 
-```yaml
-LLM-Finetuning-Playground/
-├── config/
-│   ├── default.yaml                  # Base configuration file
-│   ├── sentiment_analysis.yaml       # Sentiment analysis training configuration
-│   ├── text_generation.yaml          # Recipe generation base configuration
-│   ├── text_generation_small.yaml    # Recipe generation with smaller model settings
-│   ├── text_generation_improved.yaml # Improved recipe generation configuration
-│   └── recipe_prompt.txt             # Text prompt template for recipe generation
-├── data/
-│   ├── raw/                          # Original datasets for both projects
-│   ├── processed/                    # Preprocessed data files
-│   └── img/                          # Images for documentation
-├── docs/                             # Documentation files
-├── logs/                             # Training and evaluation logs
-├── models/                           # Saved model checkpoints
-│   ├── sentiment/                    # Sentiment analysis model
-│   └── recipe/                       # Recipe generation model
-├── notebooks/                        # Jupyter notebooks for exploration
-├── scripts/                          # Utility scripts for automation
-├── src/
-│   ├── data/                         # Data loading and preprocessing code
-│   │   ├── dataset.py                # Base dataset functions
-│   │   ├── sentiment_create_test_set.py       # Test set creation for sentiment analysis
-│   │   ├── sentiment_create_balanced_test_set.py  # Balanced test set for sentiment
-│   │   ├── prepare_gen_dataset.py    # Data preparation for text generation
-│   │   └── recipe_prepare_dataset.py # Recipe dataset preparation
-│   ├── model/                        # Model-related code
-│   │   ├── generation/               # Additional generation model components
-│   │   ├── sentiment_model_loader.py # Code to load sentiment models and tokenizers
-│   │   ├── sentiment_train.py        # Sentiment model training
-│   │   ├── sentiment_inference.py    # Sentiment model inference
-│   │   ├── sentiment_evaluate.py     # Sentiment model evaluation
-│   │   ├── sentiment_publish.py      # Publish sentiment model to HF Hub
-│   │   ├── recipe_train.py           # Recipe model training
-│   │   ├── recipe_evaluate.py        # Recipe model evaluation
-│   │   ├── recipe_export_to_ollama.py # Export recipe model to Ollama
-│   │   ├── recipe_merge_and_export_lora.py  # Merge LoRA adapters and export
-│   │   └── update_model_card.py      # Generate/update model cards (general utility)
-│   ├── utils/                        # Utility functions
-│   │   ├── config_utils.py           # Configuration utilities
-│   │   ├── recipe_formatter.py       # Format recipe outputs
-│   │   ├── recipe_generator.py       # Recipe generation utilities
-│   │   └── recipe_prompts.py         # Recipe prompt templates
-│   ├── sentiment_demo.py             # Sentiment analysis demo
-│   ├── recipe_demo.py                # Recipe generation CLI demo
-│   ├── recipe_web_demo.py            # Recipe generation web UI demo
-│   ├── direct_recipe_test.py         # Direct testing of recipe generation
-│   └── recipe_export_to_ollama_utils.py # Consolidated Ollama export utilities
-├── tests/                            # Automated tests
-│   ├── conftest.py                   # Pytest configurations
-│   ├── test_sentiment_model.py       # Tests for sentiment analysis
-│   └── test_recipe_model.py          # Tests for recipe generation
-├── wandb/                            # Weights & Biases logging data
-├── GETTING_STARTED.md                # Getting started guide
-├── GETTING_STARTED_DEMO_1.md         # Demo 1 guide with testing documentation
-├── GETTING_STARTED_DEMO_2.md         # Demo 2 guide
-├── AI_TESTING_IDEAS.md               # Ideas for AI model testing
-├── DATASET_INSTRUCTIONS.md           # Dataset preparation instructions
-├── model_card.md                     # Model card template
-├── requirements.txt                  # Project dependencies
-├── setup_env.sh                      # Environment setup script
-├── Makefile                          # Automation of common tasks
-└── LICENSE                           # Project license
+classifier = pipeline("sentiment-analysis", model="your-username/imdb-sentiment-analysis")
+result = classifier("This movie was absolutely amazing, I loved every minute of it!")
+print(result)  # [{'label': 'POSITIVE', 'score': 0.9998}]
 ```
 
-## Explanation:
+### Recipe Generation
 
-This project is organized into two main applications:
+With the recipe generation model, you can create recipes from ingredients:
+
+```bash
+# Using Ollama after export
+ollama run recipe-assistant "Create a recipe with these ingredients: chicken, rice, bell peppers, onions"
+```
+
+## Next Steps
+
+1. Follow the [Sentiment Analysis Demo Guide](GETTING_STARTED_DEMO_1.md)
+2. Try the [Recipe Generation Demo Guide](GETTING_STARTED_DEMO_2.md)
+3. Experiment with your own datasets and models
+4. Contribute to the project by adding new test types or model architectures
+
+---
+
+## Project Developer Notes
+
+### Project Structure
+
+The project is organized into two main applications:
 
 1. **Sentiment Analysis (DistilBERT)**: A classification task that analyzes movie reviews
    - Training: `src/model/sentiment_train.py`
@@ -151,58 +141,39 @@ This project is organized into two main applications:
    - Deployment: Various export utilities for Ollama
 
 The project uses:
+
 - **YAML configurations** in the `config/` directory for model parameters
 - **Weights & Biases** for experiment tracking
 - **Pytest** for automated testing
 - **Hugging Face** and **Ollama** for model deployment
 
+## File Structure
+
+```yaml
+LLM-Finetuning-Playground/
+├── config/                           # Configuration files
+│   ├── sentiment_analysis.yaml       # Sentiment analysis training configuration
+│   ├── text_generation.yaml          # Recipe generation base configuration
+│   ├── text_generation_medium_memory.yaml # Medium memory configuration
+│   └── text_generation_low_memory.yaml # Low memory configuration
+├── data/                             # Data directories
+├── models/                           # Saved model checkpoints
+├── src/                              # Source code
+│   ├── data/                         # Data processing
+│   ├── model/                        # Model training and inference
+│   └── utils/                        # Utility functions
+├── tests/                            # Automated tests
+├── GETTING_STARTED_DEMO_1.md         # Sentiment analysis guide
+├── GETTING_STARTED_DEMO_2.md         # Recipe generation guide
+├── requirements.txt                  # Project dependencies
+├── setup_env.sh                      # Environment setup script
+└── Makefile                          # Automation of common tasks
+```
+
 ## Integrations
-Here are some integrations and tools that can be used for free or on low-cost/free tiers:
 
-a. Model & Data Libraries
-Hugging Face Transformers:
-Use this library to load pretrained models and tokenizers (e.g., AutoModelForCausalLM and AutoTokenizer). It also provides the Trainer API which simplifies training loops.
-
-Hugging Face Datasets:
-Efficiently load, preprocess, and manage datasets.
-
-b. Testing and QA
-Pytest:
-A robust testing framework for Python. Write unit tests for data processing, model loading, and training routines.
-
-Coverage Tools:
-Use tools like pytest-cov to track test coverage.
-
-Mocking Libraries:
-For parts of your code that require heavy resources (like the full fine-tuning loop), you can use mocking (with libraries like unittest.mock) to simulate behavior on a small scale.
-
-c. Configuration and Experiment Management
-Configuration Management:
-Use YAML/JSON configuration files. Libraries like PyYAML can help you read configurations into your Python scripts.
-
-Logging and Monitoring:
-
-TensorBoard: Integrated with PyTorch or TensorFlow (if you use them indirectly via Hugging Face) to track metrics.
-Weights & Biases (wandb): The free tier is often sufficient for logging experiments and tracking hyperparameters.
-d. Version Control and CI/CD
-Git:
-Use Git for version control. GitHub or GitLab offer free private repositories.
-
-GitHub Actions:
-Set up a simple CI pipeline to run your tests automatically on every commit or pull request.
-
-e. Compute Resources
-Local CPU/Low-end GPU:
-Fine-tuning a 14B parameter model is resource intensive, so for testing and learning:
-
-Use a smaller model version or a subset of your data for rapid iteration.
-Leverage gradient accumulation or mixed precision training to simulate training on limited hardware.
-Cloud Platforms:
-Consider free tiers from Google Colab, Kaggle Kernels, or free trial credits from cloud providers. These can be useful for initial experiments without incurring high costs.
-
-Docker (Optional):
-Containerize your environment to ensure reproducibility and ease deployment, though this is optional if your budget is very low.
-
-## 🔄 Version Control & Collaboration
-
-### Getting Started with this Repository
+- **Hugging Face Transformers & Datasets**: For models, tokenizers, and data loading
+- **PEFT**: Parameter-Efficient Fine-Tuning with LoRA
+- **Pytest**: For unit and integration testing
+- **Weights & Biases**: For experiment tracking
+- **Ollama**: For local deployment of recipe generation models
