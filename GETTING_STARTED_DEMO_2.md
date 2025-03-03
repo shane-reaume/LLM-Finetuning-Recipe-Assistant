@@ -95,21 +95,36 @@ make recipe-train-test DATA_DIR=~/recipe_manual_data
 ```
 
 This will:
-- Process only 50 training examples
+- Process only 30 training examples
 - Train for just 1% of an epoch
-- Use reduced sequence lengths
+- Use reduced sequence lengths (32 tokens)
 - Complete in a few minutes rather than hours
 
 If the sanity test runs successfully, you can proceed with the full training.
 
 > **Troubleshooting Memory Issues**: If you encounter a "CUDA out of memory" error, your GPU may not have enough VRAM. Try these solutions:
-> 1. Edit `config/text_generation_sanity_test.yaml` and reduce `batch_size` to 1
-> 2. Further reduce `max_length` to 32
-> 3. Add `"offload_modules": true` to the LoRA configuration
-> 4. If errors persist, run the CPU version of the sanity test (very slow but works on any machine):
+> 
+> **Option 1: Further reduce memory usage**
+> 1. Edit `config/text_generation_sanity_test.yaml` and reduce `batch_size` to 1 (already set)
+> 2. Further reduce `max_length` to 16 (currently 32)
+> 3. Reduce `max_train_samples` to 20 (currently 30)
+>
+> **Option 2: Use memory optimization techniques**
+> 1. Make sure the LoRA configuration has `"offload_modules": true` (already set)
+> 2. Consider adding `"8bit_adam": true` to the config if using PyTorch >= 2.0
+> 3. Set PyTorch memory allocation configuration with:
 >    ```bash
->    make recipe-train-test-cpu DATA_DIR=~/recipe_manual_data
+>    export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:32,garbage_collection_threshold:0.6
 >    ```
+>
+> **Option 3: Run on CPU instead**
+> If all else fails, run the CPU version of the sanity test (very slow but works on any machine):
+> ```bash
+> make recipe-train-test-cpu DATA_DIR=~/recipe_manual_data
+> ```
+>
+> **Option 4: Cloud GPUs**
+> Consider using a cloud GPU service like Google Colab, Kaggle, or AWS with more VRAM.
 
 #### Option B: Run Full Training
 
@@ -128,6 +143,26 @@ This will:
 - Save the model to `models/recipe_assistant`
 
 Training typically takes 2-4 hours on a good GPU.
+
+> **Memory Requirements**: For full training, we recommend a GPU with at least 16GB VRAM.
+> For smaller GPUs (8GB), use our low-memory configuration:
+> ```bash
+> make recipe-train-low-memory DATA_DIR=~/recipe_manual_data
+> ```
+> 
+> The low-memory configuration makes the following changes:
+> 1. Reduces sequence length from 512 to 256 tokens
+> 2. Uses batch size of 1 with gradient accumulation of 8
+> 3. Enables gradient checkpointing and 8-bit optimizer
+> 4. Uses CPU offloading for LoRA modules
+> 5. Reduces the LoRA rank from 8 to 4
+>
+> If you still encounter memory issues, try reducing the dataset size by adding:
+> ```yaml
+> data:
+>   max_train_samples: 50000  # Use 50k samples instead of the full dataset
+> ```
+> to your configuration file.
 
 ### Step 4: Evaluate the Model
 
@@ -196,6 +231,7 @@ ollama run recipe-gen
 
 - `config/text_generation.yaml`: Configuration file for training and evaluation
 - `config/text_generation_sanity_test.yaml`: Configuration for quick sanity testing
+- `config/text_generation_low_memory.yaml`: Configuration for low-memory training
 - `config/recipe_prompt.txt`: Template for recipe formatting
 - `src/data/recipe_prepare_dataset.py`: Dataset preparation script
 - `src/model/recipe_train.py`: Training script
@@ -233,12 +269,21 @@ You can modify the configuration files to change how the recipe generation model
   - `test_examples_file`: Path to test examples (`data/processed/recipe_test_examples.json`)
   - Generation parameters (temperature, top_p, etc.)
 
+### Low Memory Configuration (`config/text_generation_low_memory.yaml`):
+
+This configuration is optimized for GPUs with limited VRAM (8GB):
+  - Reduces sequence length from 512 to 256 tokens
+  - Uses batch size of 1 with gradient accumulation of 8
+  - Enables gradient checkpointing and 8-bit optimizer
+  - Uses CPU offloading for LoRA modules
+  - Reduces the LoRA rank from 8 to 4
+
 ### Sanity Test Configuration (`config/text_generation_sanity_test.yaml`):
 
 This is a minimal version of the main configuration designed for quick testing:
-  - Uses only 50 training examples
+  - Uses only 30 training examples
   - Trains for just 1% of an epoch
-  - Uses much shorter sequence lengths (64 tokens)
+  - Uses much shorter sequence lengths (32 tokens)
   - Employs memory optimizations like gradient checkpointing
   - Uses a smaller batch size to reduce memory requirements
   - Saves output to a different directory (`./models/recipe_assistant_test`)

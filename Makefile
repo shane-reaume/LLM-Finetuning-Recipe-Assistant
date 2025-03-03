@@ -1,4 +1,4 @@
-.PHONY: setup test train evaluate demo clean coverage publish-sentiment update-model-card recipe-data recipe-train recipe-evaluate recipe-demo recipe-export recipe-export-versioned recipe-train-test recipe-train-test-cpu
+.PHONY: setup test train evaluate demo clean coverage publish-sentiment update-model-card recipe-data recipe-train recipe-train-low-memory recipe-evaluate recipe-demo recipe-export recipe-export-versioned recipe-train-test recipe-train-test-cpu
 
 # Setup environment
 setup:
@@ -63,9 +63,23 @@ recipe-train:
 	fi; \
 	if [ -z "$(DATA_DIR)" ]; then \
 		echo "Warning: DATA_DIR not specified. The script may fail if dataset preparation hasn't been completed."; \
-		python -m src.model.recipe_train --config $$CONFIG_PATH; \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config $$CONFIG_PATH; \
 	else \
-		python -m src.model.recipe_train --config $$CONFIG_PATH --data_dir $(DATA_DIR); \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config $$CONFIG_PATH --data_dir $(DATA_DIR); \
+	fi
+
+recipe-train-low-memory:
+	@if [ -z "$(CONFIG)" ]; then \
+		CONFIG_PATH="config/text_generation_low_memory.yaml"; \
+		echo "Using low-memory configuration: $$CONFIG_PATH"; \
+	else \
+		CONFIG_PATH="$(CONFIG)"; \
+	fi; \
+	if [ -z "$(DATA_DIR)" ]; then \
+		echo "Warning: DATA_DIR not specified. The script may fail if dataset preparation hasn't been completed."; \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config $$CONFIG_PATH; \
+	else \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config $$CONFIG_PATH --data_dir $(DATA_DIR); \
 	fi
 
 recipe-evaluate:
@@ -113,7 +127,7 @@ recipe-train-test:
 		exit 1; \
 	fi; \
 	echo "Running a quick sanity test of the recipe training process..."; \
-	PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True python -m src.model.recipe_train --config config/text_generation_sanity_test.yaml --data_dir $(DATA_DIR)
+	PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:32,garbage_collection_threshold:0.6 python -m src.model.recipe_train --config config/text_generation_sanity_test.yaml --data_dir $(DATA_DIR)
 
 # Quick sanity test for recipe training on CPU (for users with limited GPU memory)
 recipe-train-test-cpu:

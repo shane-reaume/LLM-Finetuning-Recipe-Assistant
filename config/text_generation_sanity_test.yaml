@@ -7,9 +7,9 @@ data:
   validation_split: "validation"  # Will be created if not found
   prompt_template: "Create a recipe with these ingredients: {ingredients}\n\n"
   response_key: "recipe"
-  max_length: 64  # Reduced from 128 to save memory
+  max_length: 32  # Further reduced from 64 to 32
   cache_dir: "./data/processed/generation"
-  max_train_samples: 50  # Reduced from 100 to 50 examples
+  max_train_samples: 30  # Further reduced from 50 to 30 examples
 
 # Model settings
 model:
@@ -18,7 +18,7 @@ model:
 
 # Training settings
 training:
-  batch_size: 1  # Reduced from 4 to 1
+  batch_size: 1  # Minimum batch size
   gradient_accumulation_steps: 4  # Keep effective batch size of 4
   num_train_epochs: 0.01  # Train on just 1% of an epoch
   learning_rate: 2.0e-5
@@ -30,19 +30,26 @@ training:
   evaluation_strategy: "steps"
   eval_steps: 10
   fp16: true
-  gradient_checkpointing: true  # Added to save memory
+  gradient_checkpointing: true  # Save memory
+  optim: "adamw_8bit"  # Use 8-bit optimizer to save memory
   lora:  # Use PEFT with LoRA for efficient fine-tuning
     enabled: true
-    r: 4  # Reduced from 8 to save memory
-    alpha: 8  # Reduced from 16 to maintain r/alpha ratio
+    r: 4  # Low rank
+    alpha: 8  
     dropout: 0.05
     target_modules: ["q_proj", "v_proj"]
+    bias: "none"
+    # Added memory optimizations
+    modules_to_save: []
+    offload_folder: "offload"  # Enable CPU offloading
+    "offload_modules": true    # Offload modules to CPU
+    "attn_implementation": "flash_attention_2"  # Use Flash Attention if available
 
 # Testing settings
 testing:
   test_examples_file: "data/processed/recipe_test_examples.json"
   generation_params:
-    max_new_tokens: 64  # Reduced from 128
+    max_new_tokens: 32  # Reduced from 64 to 32
     temperature: 0.7
     top_p: 0.9
     top_k: 50
