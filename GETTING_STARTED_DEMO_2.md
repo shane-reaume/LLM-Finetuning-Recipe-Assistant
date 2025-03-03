@@ -372,3 +372,55 @@ pytest --cov=src --cov-report=html
 The HTML coverage report will be generated in the `htmlcov/` directory and can be viewed in a browser.
 
 For a comprehensive guide to our testing philosophy, methodology, and approach to ML model testing, please refer to the detailed testing documentation in [GETTING_STARTED_DEMO_1.md](GETTING_STARTED_DEMO_1.md#testing-philosophy-and-methodology).
+
+## Training the Recipe Generator Model
+
+To train the model, first make sure you have processed the data using the steps above. Then run:
+
+```bash
+make recipe-train DATA_DIR=~/recipe_manual_data
+```
+
+This will train the recipe generation model according to the configuration in `config/text_generation.yaml`. Training this small model will usually take 4-6 hours on a consumer GPU with 16GB of VRAM. The process will save checkpoints to the location specified in the config file.
+
+### Memory-Optimized Training Options
+
+We provide several training configurations to accommodate different GPU memory constraints:
+
+1. **Standard Training** (16GB+ VRAM recommended):
+   ```bash
+   make recipe-train DATA_DIR=~/recipe_manual_data
+   ```
+
+2. **Medium-Memory Training** (8GB+ VRAM, faster than low-memory):
+   ```bash
+   make recipe-train-medium-memory DATA_DIR=~/recipe_manual_data
+   ```
+   - Uses a balanced approach with memory savings but better speed
+   - Trains on 100,000 examples instead of the full dataset
+   - Expected training time: 2-3 hours
+
+3. **Low-Memory Training** (6GB+ VRAM):
+   ```bash
+   make recipe-train-low-memory DATA_DIR=~/recipe_manual_data
+   ```
+   - Uses aggressive memory optimizations including CPU offloading
+   - Significantly slower than standard training
+   - Expected training time: 8-10 hours
+
+Choose the option that best matches your hardware capabilities. The medium-memory option provides a good balance between memory efficiency and training speed.
+
+### Quick Sanity Test
+
+```bash
+# Run a minimal training session for testing purposes
+make recipe-train-test DATA_DIR=~/recipe_manual_data
+```
+
+This will:
+- Process only 30 training examples
+- Train for just 1% of an epoch
+- Use reduced sequence lengths (32 tokens)
+- Complete in a few minutes rather than hours
+
+If the sanity test runs successfully, you can proceed with the full training.
