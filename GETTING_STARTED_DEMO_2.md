@@ -1,6 +1,35 @@
 # Getting Started with LLM-Finetuning-Playground - Recipe Generation
 
-**Recipe Generation** - Using a decoder model (TinyLlama) for text generation
+**Recipe Generation** - A hands-on demo project for fine-tuning a small language model with LoRA adapters
+
+## 🔍 Project Overview
+
+This demo project demonstrates:
+
+* **Model Architecture**: 
+  * Fine-tuning a decoder-based **TinyLlama** (1.1B parameters) with LoRA adapters
+  * Parameter-efficient fine-tuning with low-rank adaptation (LoRA)
+  * Conditional text generation with ingredient-to-recipe formatting
+  * Half-precision training (FP16) for memory efficiency
+
+* **Training Methodology**:
+  * Instruction fine-tuning on the RecipeNLG dataset 
+  * Low-rank adapter training targeting key attention modules (q_proj, v_proj)
+  * Efficient training with gradient accumulation and checkpointing
+  * Memory optimization with offloading techniques for 8GB GPUs
+
+* **Testing Framework**:
+  * **Functional Tests**: Validating recipe generation from ingredient prompts
+  * **Quality Assessment**: Measuring coherence and adherence to ingredients
+  * **Memory Tests**: Ensuring model can run on consumer hardware
+  * **Format Tests**: Verifying proper recipe structure in outputs
+  * **Performance Benchmarks**: Tracking generation speed and throughput
+
+* **Deployment Strategy**:
+  * Export to **Ollama** for local inference without dependencies
+  * LoRA adapter merging with base model for improved performance
+  * Model quantization options for reduced memory footprint
+  * Interactive CLI and web-based demo interfaces
 
 ## 🌟 Overview
 

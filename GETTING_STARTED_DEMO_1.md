@@ -1,10 +1,37 @@
 # Getting Started with LLM-Finetuning-Playground - Sentiment Analysis
 
-**Sentiment Analysis** - Using an encoder model (DistilBERT) for classification
+**Sentiment Analysis** - A beginner-friendly demo project for fine-tuning and testing a text classification model
+
+## 🔍 Project Overview
+
+This demo project demonstrates:
+
+* **Model Architecture**: 
+  * Fine-tuning an encoder-based **DistilBERT** model for binary text classification
+  * Transfer learning approach using a pre-trained language model with a classification head
+  * Tokenizer-based preprocessing with fixed sequence length (128 tokens)
+
+* **Training Methodology**:
+  * Binary classification on the IMDB movie reviews dataset (positive/negative sentiment)
+  * Supervised fine-tuning with cross-entropy loss
+  * Mixed-precision training (FP16) for memory efficiency
+  * AdamW optimizer with learning rate of 2e-5 and weight decay
+
+* **Testing Framework**:
+  * **Unit Tests**: Validating model loading and architecture
+  * **Functional Tests**: Verifying correct predictions on known examples
+  * **Performance Tests**: Ensuring accuracy and inference speed meet thresholds
+  * **Edge Case Tests**: Testing model behavior with unusual inputs
+  * **Batch Processing Tests**: Validating efficient batch prediction capabilities
+
+* **Evaluation Metrics**:
+  * Primary metrics: Accuracy and F1 score
+  * Secondary metrics: Precision, recall, and confidence thresholds
+  * Performance benchmarking: Inference latency measurements
 
 ## 🎓 Demo Model
 
-A trained version of this sentiment analysis model is available on Hugging Face:
+If you want to use a trained version of this sentiment analysis model before learning how to train your own, it is available on Hugging Face:
 [https://huggingface.co/shane-reaume/imdb-sentiment-analysis](https://huggingface.co/shane-reaume/imdb-sentiment-analysis)
 
 You can try it directly in your browser or use it in your code with the Hugging Face API:
