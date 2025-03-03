@@ -85,7 +85,13 @@ This processes recipe data and creates test examples at `data/processed/recipe_t
 
 ### Step 3: Train the Model
 
-Before running the full training process (which can take 2-4 hours), you may want to perform a quick sanity test to ensure everything is configured correctly:
+Before running the full training process (which can take 2-4 hours), you may want to perform a quick check of your OS and run a sanity test to ensure everything is configured correctly:
+
+#### Calculate your OS
+
+We have provided a script to get recommended config settings:
+
+`python scripts/config_optimizer.py`
 
 #### Option A: Run a Quick Sanity Test (Recommended)
 
