@@ -1,49 +1,55 @@
+# Text Generation Model Configuration
+
+# Data settings
 data:
-  cache_dir: ./data/processed/generation
-  dataset_name: recipe_nlg
-  max_length: 512
-  prompt_template: 'Create a recipe with these ingredients: {ingredients}
+  dataset_name: "recipe_nlg"  # A dataset of recipes
+  train_split: "train"
+  validation_split: "validation"  # Will be created if not found
+  prompt_template: "Create a recipe with these ingredients: {ingredients}\n\n"
+  response_key: "recipe"
+  max_length: 256
+  cache_dir: "./data/processed/generation"
+  # Uncomment and adjust the line below if you're running out of memory
+  max_train_samples: 100000  # Limit dataset size for memory-constrained environments
 
-
-    '
-  response_key: recipe
-  train_split: train
-  validation_split: validation
+# Model settings
 model:
-  name: TinyLlama/TinyLlama-1.1B-Chat-v1.0
-  save_dir: ./models/recipe_assistant
-testing:
-  evaluation_metrics:
-  - perplexity
-  - rouge
-  generation_params:
-    do_sample: true
-    max_new_tokens: 256
-    temperature: 0.7
-    top_k: 50
-    top_p: 0.9
-  test_examples_file: data/processed/recipe_test_examples.json
+  name: "TinyLlama/TinyLlama-1.1B-Chat-v1.0"  # Small enough for consumer GPUs
+  save_dir: "./models/recipe_assistant"
+
+# Training settings
 training:
-  batch_size: 8
+  batch_size: 1
+  gradient_accumulation_steps: 16  # Effective batch size of 16
+  num_train_epochs: 4
+  learning_rate: 2.0e-5
+  weight_decay: 0.01
+  warmup_steps: 100
+  save_steps: 500
+  save_total_limit: 1
+  logging_dir: "./logs/recipe_assistant"
+  evaluation_strategy: "steps"
   eval_steps: 500
-  evaluation_strategy: steps
   fp16: true
-  gradient_accumulation_steps: 4
-  learning_rate: 2.0e-05
-  logging_dir: ./logs/recipe_assistant
-  lora:
-    alpha: 64
-    dropout: 0.05
+  fp16_opt_level: "O1"
+  report_to: "wandb"
+  run_name: "recipe_assistant"
+  lora:  # Use PEFT with LoRA for efficient fine-tuning
     enabled: true
     r: 8
-    target_modules:
-    - q_proj
-    - v_proj
-    - k_proj
-    - o_proj
-  max_train_samples: 10000
-  num_train_epochs: 8
-  save_steps: 500
-  save_total_limit: 2
-  warmup_steps: 200
-  weight_decay: 0.01
+    alpha: 16
+    dropout: 0.05
+    target_modules: ["q_proj", "v_proj"]
+
+# Testing settings
+testing:
+  test_examples_file: "data/processed/recipe_test_examples.json"
+  generation_params:
+    max_new_tokens: 256
+    temperature: 0.7
+    top_p: 0.9
+    top_k: 50
+    do_sample: true
+  evaluation_metrics:
+    - perplexity
+    - rouge
