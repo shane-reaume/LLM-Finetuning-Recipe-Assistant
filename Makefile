@@ -1,4 +1,4 @@
-.PHONY: setup test train evaluate demo clean coverage publish-sentiment update-model-card recipe-data recipe-train recipe-train-low-memory recipe-train-medium-memory recipe-evaluate recipe-demo recipe-export recipe-export-versioned recipe-train-test recipe-train-test-cpu
+.PHONY: setup test train evaluate demo clean coverage publish-sentiment update-model-card recipe-data recipe-train recipe-train-low-memory recipe-train-medium-memory recipe-evaluate recipe-demo recipe-export recipe-export-versioned recipe-train-test recipe-train-test-cpuersioned recipe-train-test recipe-train-test-cpu gpu-tools gpu-analyze gpu-memory gpu-recommend gpu-configs
 
 # Setup environment
 setup:
@@ -82,6 +82,22 @@ recipe-train-low-memory:
 		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config $$CONFIG_PATH --data_dir $(DATA_DIR); \
 	fi
 
+recipe-train-medium-memory:
+	@if [ -z "$(DATA_DIR)" ]; then \
+		echo "Warning: DATA_DIR not specified. The script may fail if dataset preparation hasn't been completed."; \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/text_generation_medium_memory.yaml; \
+	else \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/text_generation_medium_memory.yaml --data_dir $(DATA_DIR); \
+	fi
+
+recipe-train-high-memory:
+	@if [ -z "$(DATA_DIR)" ]; then \
+		echo "Warning: DATA_DIR not specified. The script may fail if dataset preparation hasn't been completed."; \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.6 python -m src.model.recipe_train --config config/text_generation_optimized_memory.yaml; \
+	else \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.6 python -m src.model.recipe_train --config config/text_generation_optimized_memory.yaml --data_dir $(DATA_DIR); \
+	fi
+
 recipe-train-optimized:
 	@if [ -z "$(DATA_DIR)" ]; then \
 		echo "Warning: DATA_DIR not specified. The script may fail if dataset preparation hasn't been completed."; \
@@ -130,12 +146,12 @@ clean:
 
 # Quick sanity test for recipe training
 recipe-train-test:
-ifdef DATA_DIR
-	python -m src.data.recipe_prepare_dataset --config config/text_generation_sanity_test.yaml --data_dir $(DATA_DIR)
-	python -m src.model.recipe_train --config config/text_generation_sanity_test.yaml --data_dir $(DATA_DIR)
-else
-	$(error DATA_DIR is not set. Please specify DATA_DIR=path/to/data)
-endif
+	@if [ -z "$(DATA_DIR)" ]; then \
+		echo "Error: DATA_DIR is required for sanity test (e.g., make recipe-train-test DATA_DIR=~/recipe_manual_data)"; \
+		exit 1; \
+	fi; \
+	echo "Running a quick sanity test of the recipe training process..."; \
+	PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:32,garbage_collection_threshold:0.6 python -m src.model.recipe_train --config config/text_generation_sanity_test.yaml --data_dir $(DATA_DIR)
 
 # Quick sanity test for recipe training on CPU (for users with limited GPU memory)
 recipe-train-test-cpu:
@@ -145,3 +161,29 @@ recipe-train-test-cpu:
 	fi; \
 	echo "Running a quick sanity test of the recipe training process on CPU (this will be slow)..."; \
 	CUDA_VISIBLE_DEVICES=-1 python -m src.model.recipe_train --config config/text_generation_sanity_test.yaml --data_dir $(DATA_DIR)
+
+# GPU tools
+gpu-tools:
+	@echo "GPU Tools - Hardware Analysis and Memory Management"
+	@echo ""
+	@echo "Usage:"
+	@echo "  make gpu-analyze          - Analyze hardware and recommend configuration"
+	@echo "  make gpu-memory           - Display GPU memory statistics and recommendations"
+	@echo "  make gpu-recommend        - Get recommended configuration for your hardware"
+	@echo "  make gpu-configs          - List available configurations"
+	@echo ""
+	@echo "Examples:"
+	@echo "  make gpu-analyze CONFIG=config/text_generation_optimized.yaml UPDATE=1"
+	@echo "  make gpu-memory TEST=1"
+
+gpu-analyze:
+	python scripts/gpu_tools.py analyze --config $(if $(CONFIG),$(CONFIG),config/text_generation.yaml) $(if $(UPDATE),--update,) $(if $(OUTPUT),--output $(OUTPUT),)
+
+gpu-memory:
+	python scripts/gpu_tools.py memory $(if $(TEST),--test,) $(if $(ENV),--env,) $(if $(BATCH),--batch,)
+
+gpu-recommend:
+	python scripts/gpu_tools.py recommend $(if $(MODEL),--model $(MODEL),)
+
+gpu-configs:
+	python scripts/gpu_tools.py configs $(if $(DESCRIBE),--describe,)

@@ -1,26 +1,26 @@
-# Text Generation Model Configuration
+# A more memory-optimized version of the training configuration
 
 # Data settings
 data:
-  dataset_name: "recipe_nlg"  # A dataset of recipes
+  dataset_name: "recipe_nlg"
   train_split: "train"
-  validation_split: "validation"  # Will be created if not found
+  validation_split: "validation"
   prompt_template: "Create a recipe with these ingredients: {ingredients}\n\n"
   response_key: "recipe"
-  max_length: 256
+  max_length: 1024
   cache_dir: "./data/processed/generation"
-  # Uncomment and adjust the line below if you're running out of memory
-  max_train_samples: 100000  # Limit dataset size for memory-constrained environments
+  max_train_samples: 100000
 
 # Model settings
 model:
-  name: "TinyLlama/TinyLlama-1.1B-Chat-v1.0"  # Small enough for consumer GPUs
+  name: "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
   save_dir: "./models/recipe_assistant"
 
 # Training settings
 training:
   batch_size: 2
-  gradient_accumulation_steps: 16  # Effective batch size of 16
+  batch_first: true
+  gradient_accumulation_steps: 16
   num_train_epochs: 4
   learning_rate: 2.0e-5
   weight_decay: 0.01
@@ -31,15 +31,21 @@ training:
   evaluation_strategy: "steps"
   eval_steps: 500
   fp16: true
-  fp16_opt_level: "O1"
+  fp16_opt_level: "O0"
   report_to: "wandb"
-  run_name: "recipe_assistant"
-  lora:  # Use PEFT with LoRA for efficient fine-tuning
+  run_name: "recipe_assistant_high_mem"
+  # CUDA memory optimization
+  max_grad_norm: 1.0
+  dataloader_num_workers: 4  # Increase data loading parallelism
+  lora:
     enabled: true
     r: 8
     alpha: 16
     dropout: 0.05
     target_modules: ["q_proj", "v_proj"]
+  # Add these optimizations:
+  gradient_checkpointing: true  # Trades computation for memory
+  dataloader_pin_memory: true  # Faster CPU->GPU transfers
 
 # Testing settings
 testing:
