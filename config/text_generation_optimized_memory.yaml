@@ -20,7 +20,7 @@ model:
 training:
   batch_size: 2
   batch_first: true
-  gradient_accumulation_steps: 16
+  gradient_accumulation_steps: 8
   num_train_epochs: 4
   learning_rate: 2.0e-5
   weight_decay: 0.01
