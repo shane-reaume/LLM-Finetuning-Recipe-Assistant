@@ -7,7 +7,7 @@ data:
   validation_split: "validation"
   prompt_template: "Create a recipe with these ingredients: {ingredients}\n\n"
   response_key: "recipe"
-  max_length: 1024
+  max_length: 256
   cache_dir: "./data/processed/generation"
   max_train_samples: 100000
 
@@ -18,29 +18,32 @@ model:
 
 # Training settings
 training:
-  batch_size: 2
+  batch_size: 6
   batch_first: true
-  gradient_accumulation_steps: 8
+  gradient_accumulation_steps: 24
   num_train_epochs: 4
   learning_rate: 2.0e-5
   weight_decay: 0.01
   warmup_steps: 100
-  save_steps: 500
+  save_steps: 1000
   save_total_limit: 2
   logging_dir: "./logs/recipe_assistant"
   evaluation_strategy: "steps"
-  eval_steps: 500
+  eval_steps: 1000
   fp16: true
-  fp16_opt_level: "O0"
+  fp16_full_eval: true
+  # fp16_opt_level: "O1"
+  use_flash_attention_2: true
   report_to: "wandb"
   run_name: "recipe_assistant_high_mem"
   # CUDA memory optimization
   max_grad_norm: 1.0
-  dataloader_num_workers: 4  # Increase data loading parallelism
+  dataloader_num_workers: 32  # Increase data loading parallelism
+  prefetch_factor: 2  # Pre-fetch data for next batch
   lora:
     enabled: true
-    r: 8
-    alpha: 16
+    r: 32
+    alpha: 64
     dropout: 0.05
     target_modules: ["q_proj", "v_proj"]
   # Add these optimizations:
