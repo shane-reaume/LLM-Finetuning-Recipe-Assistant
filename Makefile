@@ -98,6 +98,14 @@ recipe-train-geforce-rtx-3060:
 		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/text_generation_3060_geforce_rtx.yaml --data_dir $(DATA_DIR); \
 	fi
 
+recipe-train-geforce-rtx-2070:
+	@if [ -z "$(DATA_DIR)" ]; then \
+		echo "Warning: DATA_DIR not specified. The script may fail if dataset preparation hasn't been completed."; \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/text_generation_2070_geforce_rtx.yaml; \
+	else \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/text_generation_2070_geforce_rtx.yaml --data_dir $(DATA_DIR); \
+	fi
+
 recipe-train-optimized:
 	@if [ -z "$(DATA_DIR)" ]; then \
 		echo "Warning: DATA_DIR not specified. The script may fail if dataset preparation hasn't been completed."; \

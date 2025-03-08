@@ -1,4 +1,4 @@
-# Memory-optimized Text Generation Model Configuration
+# A more memory-optimized version of the training configuration
 
 # Data settings
 data:
@@ -6,41 +6,52 @@ data:
   train_split: "train"
   validation_split: "validation"
   prompt_template: "Create a recipe with these ingredients: {ingredients}\n\n"
-  response_key: "directions"
-  max_length: 256  # Reduced from 512
-  max_train_samples: 10000  # Limit training data
+  response_key: "recipe"
+  max_length: 256
   cache_dir: "./data/processed/generation"
+  max_train_samples: 100000
 
 # Model settings
 model:
   name: "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
   save_dir: "./models/recipe_assistant"
-  load_in_8bit: true  # Use 8-bit quantization for extreme memory savings
 
 # Training settings
 training:
-  batch_size: 1  # Minimum batch size
-  gradient_accumulation_steps: 16  # Accumulate gradients to simulate larger batch
-  num_train_epochs: 1  # Just one epoch
+  batch_size: 1
+  batch_first: true
+  gradient_accumulation_steps: 64
+  num_train_epochs: 4
   learning_rate: 2.0e-5
   weight_decay: 0.01
   warmup_steps: 100
   save_steps: 500
-  save_total_limit: 1
+  save_total_limit: 2
   logging_dir: "./logs/recipe_assistant"
   evaluation_strategy: "steps"
   eval_steps: 500
   fp16: true
+  fp16_full_eval: true
+  # fp16_opt_level: "O1"
+  report_to: "wandb"
+  run_name: "recipe_assistant_high_mem"
+  # CUDA memory optimization
+  max_grad_norm: 1.0
+  dataloader_num_workers: 2  # Increase data loading parallelism
+  prefetch_factor: 2  # Pre-fetch data for next batch
   lora:
     enabled: true
-    r: 4  # Reduced from 8
-    alpha: 16
-    dropout: 0.05
+    r: 4
+    alpha: 8
+    dropout: 0.1
     target_modules: ["q_proj", "v_proj"]
+  # Add these optimizations:
+  gradient_checkpointing: true  # Trades computation for memory
+  dataloader_pin_memory: true  # Faster CPU->GPU transfers
 
 # Testing settings
 testing:
-  test_examples_file: "data/processed/generation/test_examples.json"
+  test_examples_file: "data/processed/recipe_test_examples.json"
   generation_params:
     max_new_tokens: 256
     temperature: 0.7
