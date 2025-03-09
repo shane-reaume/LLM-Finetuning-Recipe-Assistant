@@ -18,9 +18,10 @@ model:
 
 # Training settings
 training:
-  batch_size: 6
+  batch_size: 8
   batch_first: true
-  gradient_accumulation_steps: 24
+  gradient_accumulation_steps: 8
+  gradient_checkpointing: true  # Trades computation for memory
   num_train_epochs: 4
   learning_rate: 2.0e-5
   weight_decay: 0.01
@@ -34,21 +35,19 @@ training:
   fp16_full_eval: true
   # fp16_opt_level: "O1"
   use_flash_attention_2: true
-  report_to: "wandb"
+  # report_to: "wandb"
   run_name: "recipe_assistant_high_mem"
   # CUDA memory optimization
   max_grad_norm: 1.0
-  dataloader_num_workers: 32  # Increase data loading parallelism
+  dataloader_num_workers: 8  # Increase data loading parallelism
+  dataloader_pin_memory: true  # Faster CPU->GPU transfers
   prefetch_factor: 2  # Pre-fetch data for next batch
   lora:
     enabled: true
     r: 32
-    alpha: 64
+    alpha: 32
     dropout: 0.05
     target_modules: ["q_proj", "v_proj"]
-  # Add these optimizations:
-  gradient_checkpointing: true  # Trades computation for memory
-  dataloader_pin_memory: true  # Faster CPU->GPU transfers
 
 # Testing settings
 testing:
