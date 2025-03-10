@@ -231,3 +231,19 @@ wandb/
 # Hugging Face cache
 .huggingface/
 
+# Gradio certificates and local files# Gradio certificates and local files
+
+
+
+
+
+
+
+
+
+
+Thumbs.db.DS_Store# OS specific*.key*.crt*.pem.gradio/.gradio/
+*.pem
+*.crt
+*.key
+

@@ -42,36 +42,8 @@ This demo shows how to fine-tune a small language model to generate cooking reci
 
 ## 📋 Prerequisites
 
-- **Python 3.12.3 or later**
-- **Git** for version control
 - **GPU with 8GB+ VRAM** recommended for training (CPU can be used but will be very slow)
-- **Basic Python knowledge** (No ML experience required)
 - **Ollama** (optional, for local deployment) - [Install Ollama](https://ollama.ai/download)
-
-## 🔧 Initial Setup
-
-### Step 1: Clone the repository and set up environment
-
-```bash
-git clone https://github.com/your-repo/LLM-Finetuning-Playground.git
-cd LLM-Finetuning-Playground
-chmod +x setup_env.sh  # Only needs to be done once
-./setup_env.sh
-```
-
-This will:
-
-- Create a virtual environment in the `venv` directory
-- Install all dependencies
-- Create necessary project directories
-
-### Step 2: Activate the virtual environment
-
-(if not already activated by the script)
-
-```bash
-source venv/bin/activate
-```
 
 ## Recipe Generation Project
 

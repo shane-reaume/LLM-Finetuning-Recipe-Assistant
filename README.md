@@ -18,7 +18,7 @@ This project demonstrates how to:
 - **Git** for version control
 - **GPU with VRAM**:
   - 8GB+ recommended for sentiment analysis
-  - 8GB+ required for recipe generation (16GB+ preferred)
+  - 8GB+ required for recipe generation (12GB+ preferred)
   - CPU-only training is possible but very slow
 - **Basic Python knowledge** (No ML experience required)
 - **Platform Compatibility**:
