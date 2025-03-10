@@ -13,7 +13,7 @@ data:
 # Model settings
 model:
   name: "TinyLlama/TinyLlama-1.1B-Chat-v1.0"  # Small enough for consumer GPUs
-  save_dir: "./models/recipe_assistant"
+  save_dir: "./models/recipe_assistant_low_memory"
 
 # Training settings
 training:
@@ -25,7 +25,7 @@ training:
   warmup_steps: 100
   save_steps: 500
   save_total_limit: 2
-  logging_dir: "./logs/recipe_assistant"
+  logging_dir: "./logs/recipe_assistant_low_memory"
   evaluation_strategy: "steps"
   eval_steps: 100
   fp16: true

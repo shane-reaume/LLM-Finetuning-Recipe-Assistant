@@ -14,7 +14,7 @@ data:
 # Model settings
 model:
   name: "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
-  save_dir: "./models/recipe_assistant"
+  save_dir: "./models/recipe_assistant_3060_geforce_rtx"
 
 # Training settings
 training:
@@ -28,7 +28,7 @@ training:
   warmup_steps: 100
   save_steps: 1000
   save_total_limit: 2
-  logging_dir: "./logs/recipe_assistant"
+  logging_dir: "./logs/recipe_assistant_3060_geforce_rtx"
   evaluation_strategy: "steps"
   eval_steps: 1000
   fp16: true
@@ -36,7 +36,7 @@ training:
   # fp16_opt_level: "O1"
   use_flash_attention_2: true
   # report_to: "wandb"
-  run_name: "recipe_assistant_high_mem"
+  run_name: "recipe_assistant_3060_geforce_rtx"
   # CUDA memory optimization
   max_grad_norm: 1.0
   dataloader_num_workers: 8  # Increase data loading parallelism
