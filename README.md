@@ -1,179 +1,153 @@
-# LLM-Finetuning-Playground
+# LLM-Finetuning-Recipe-Assistant
 
-A beginner-friendly project for fine-tuning, testing, and deploying language models with a strong emphasis on quality assurance and testing methodologies.
+A beginner-friendly project for fine-tuning, testing, and deploying language models that emphasizes quality assurance methodologies for ML/AI systems.
 
-## 🎯 What This Project Does
+## 🎯 Project Overview
 
-This project demonstrates how to:
+This project demonstrates a complete ML lifecycle for recipe generation with QA practices integrated at every stage:
 
-- Fine-tune language models for different types of tasks (classification and generation)
-- Implement proper testing and evaluation methodologies for LLMs
-- Create evaluation metrics and test sets for consistent model testing
-- Deploy models to different platforms (Hugging Face Hub, Ollama)
-- Create interactive demos for testing models
+- **Model Development**: Fine-tune TinyLlama (1.1B parameters) to generate cooking recipes from ingredient lists
+- **QA Integration**: Implement testing strategies throughout the ML development pipeline
+- **Memory Optimization**: Configure training for different hardware capabilities (6GB-16GB+ VRAM)
+- **Deployment & Validation**: Export trained models to Ollama for practical usage testing
+
+Perfect for QA engineers looking to understand how quality assurance fits into ML projects.
+
+### 📚 Documentation
+
+- [Getting Started Guide](GETTING_STARTED.md) - Detailed setup and usage instructions
+- [Prompt Format Guide](docs/PROMPT_FORMAT.md) - How to correctly format prompts
+- [Test Examples Guide](docs/TEST_EXAMPLES.md) - Understanding the test examples
+- [Testing Guide](docs/TESTING_GUIDE.md) - Best practices for model testing
+- [Documentation Index](docs/README.md) - Overview of all documentation
+
+## 🔍 Why This Project?
+
+Traditional software QA focuses on deterministic systems with clear right/wrong outcomes. Machine learning brings unique challenges:
+
+- **ML systems are probabilistic** - outputs vary even with identical inputs
+- **Quality is subjective** - "correctness" often depends on human judgment
+- **Failure modes are complex** - issues might stem from data, model architecture, or training
+- **Testing requires specialized metrics** - beyond simple pass/fail
+
+This project bridges the gap between traditional QA and ML testing by demonstrating practical approaches to each challenge.
 
 ## 📋 System Requirements
 
 - **Python 3.12.3 or higher**
 - **Git** for version control
 - **GPU with VRAM**:
-  - 8GB+ recommended for sentiment analysis
   - 8GB+ required for recipe generation (12GB+ preferred)
-  - CPU-only training is possible but very slow
+  - CPU-only training possible but very slow
 - **Basic Python knowledge** (No ML experience required)
 - **Platform Compatibility**:
   - ✅ **Windows 11**: Using WSL with Ubuntu
-  - ✅ **Linux**: Confirmed on Debian-based distributions like Linux Mint and Ubuntu
+  - ✅ **Linux**: Confirmed on Debian-based distributions
   - ❌ **macOS**: Not currently compatible due to PyTorch version requirements
-    - Project uses PyTorch 2.6.0, while macOS is limited to PyTorch 2.2.0
-    - May work with modifications to `requirements.txt` but not officially supported
 
-## 🔧 Initial Setup
+## 🔧 Quick Start
 
 ```bash
-git clone https://github.com/your-repo/LLM-Finetuning-Playground.git
-cd LLM-Finetuning-Playground
+git clone https://github.com/your-repo/LLM-Finetuning-Recipe-Assistant.git
+cd LLM-Finetuning-Recipe-Assistant
 chmod +x setup_env.sh
 ./setup_env.sh
 ```
 
-This script will:
+Then follow the [detailed guide](GETTING_STARTED.md) for complete instructions.
 
-- Create a virtual environment
-- Install all dependencies
-- Create necessary project directories
+## 🧪 QA & Testing Methodology
 
-## 🤖 Demo Projects
+This project demonstrates how ML testing differs from traditional software testing:
 
-### 1. Sentiment Analysis (Classification)
+### Testing Throughout the ML Lifecycle
 
-![Sentiment Analysis Demo](data/img/sentiment-analysis-demo.png)
+| Stage | Traditional QA | ML QA | Implementation |
+|-------|----------------|-------|----------------|
+| **Data Preparation** | Input validation | Data quality checks, bias detection | Data preprocessing scripts with validation |
+| **Training** | N/A | Convergence monitoring, loss analysis | Automated metric logging, early stopping |
+| **Model Validation** | Functional testing | Accuracy metrics, robustness testing | Test set evaluation, performance benchmarks |
+| **Deployment** | Integration testing | Latency testing, memory usage | Ollama export with performance metrics |
 
-- **Model Architecture**: Fine-tuning a **DistilBERT** encoder model for binary text classification
-- **Training Methodology**: Binary classification on the IMDB movie reviews dataset
-- **Key Techniques**: Transfer learning, mixed-precision training, supervised fine-tuning
-- **Evaluation Metrics**: Accuracy, F1 score, precision, recall
-- **Deployment Target**: Published to **Hugging Face Hub**
+### Key Testing Types Implemented
 
-→ [**Get Started with Sentiment Analysis Demo**](GETTING_STARTED_DEMO_1.md)
-
-### 2. Recipe Assistant (Text Generation)
-
-- **Model Architecture**: Fine-tuning a **TinyLlama** (1.1B parameters) with LoRA adapters
-- **Training Methodology**: Instruction fine-tuning on the RecipeNLG dataset
-- **Key Techniques**: Parameter-efficient training, gradient checkpointing, memory optimizations
-- **Memory-Optimized Options**: Choose from standard, medium, or low-memory training configurations
-- **Deployment Target**: Exported to **Ollama** for local inference
-
-→ [**Get Started with Recipe Generation Demo**](GETTING_STARTED_DEMO_2.md)
-
-## 🧪 Testing & Quality Assurance Focus
-
-This project places special emphasis on testing methodologies for ML models. For a comprehensive guide to our testing approach, see [GETTING_STARTED_DEMO_1.md#testing-philosophy-and-methodology](GETTING_STARTED_DEMO_1.md#testing-philosophy-and-methodology).
-
-### Test Types Implemented
-
-- **Unit tests**: Testing individual components like data loaders
-- **Functional tests**: Testing model predictions with known inputs
-- **Performance tests**: Ensuring the model meets accuracy and speed requirements
-- **Balanced test sets**: Creating test data with equal class distribution
-- **High-confidence evaluations**: Analyzing model confidence in predictions
-- **Memory tests**: Ensuring models can run on consumer hardware
+- **Functional Tests**: Verify the model generates recipes from ingredients
+- **Quality Assessment**: Measure coherence and ingredient adherence  
+- **Memory Tests**: Ensure models work on consumer hardware
+- **Performance Tests**: Validate inference speed and throughput
+- **Format Tests**: Verify recipe structure follows expected pattern
 
 ### Testing Principles
 
-- **Reproducibility**: Tests use fixed test sets to ensure consistent evaluation
+- **Reproducibility**: Fixed test sets and seeds ensure consistent evaluation
 - **Isolation**: Components are tested independently
-- **Metrics tracking**: F1 score, precision, recall, and accuracy are tracked
-- **Performance benchmarking**: Measuring inference speed and memory usage
+- **Observability**: Metrics are tracked and logged for analysis
+- **Benchmarking**: Performance characteristics are measured systematically
 
 ## 📊 Example Results
 
-### Sentiment Analysis
-
-After training the sentiment analysis model, you'll be able to classify text sentiment:
-
-```python
-from transformers import pipeline
-
-classifier = pipeline("sentiment-analysis", model="your-username/imdb-sentiment-analysis")
-result = classifier("This movie was absolutely amazing, I loved every minute of it!")
-print(result)  # [{'label': 'POSITIVE', 'score': 0.9998}]
-```
-
-### Recipe Generation
-
-With the recipe generation model, you can create recipes from ingredients:
+After training, you can generate recipes from ingredient lists:
 
 ```bash
 # Using Ollama after export
 ollama run recipe-assistant "Create a recipe with these ingredients: chicken, rice, bell peppers, onions"
 ```
 
-## Next Steps
+For detailed information on training, evaluation, and deployment, see the [Getting Started Guide](GETTING_STARTED.md).
 
-1. Follow the [Sentiment Analysis Demo Guide](GETTING_STARTED_DEMO_1.md)
-2. Try the [Recipe Generation Demo Guide](GETTING_STARTED_DEMO_2.md)
-3. Experiment with your own datasets and models
-4. Contribute to the project by adding new test types or model architectures
+## 📋 Prompt Format Requirements
 
----
+The recipe model requires a specific prompt format to generate high-quality recipes:
 
-## Project Developer Notes
-
-### Project Structure
-
-The project is organized into two main applications:
-
-1. **Sentiment Analysis (DistilBERT)**: A classification task that analyzes movie reviews
-   - Training: `src/model/sentiment_train.py`
-   - Inference: `src/model/sentiment_inference.py`  
-   - Demo: `src/sentiment_demo.py`
-   - Tests: `tests/test_sentiment_model.py`
-
-2. **Recipe Generation (TinyLlama)**: A text generation task that creates recipes
-   - Training: `src/model/recipe_train.py`
-   - Evaluation: `src/model/recipe_evaluate.py`
-   - Demos: 
-     - CLI: `src/recipe_demo.py`
-     - Web UI: `src/recipe_web_demo.py`
-   - Tests: `tests/test_recipe_model.py`
-   - Deployment: Various export utilities for Ollama
-
-The project uses:
-
-- **YAML configurations** in the `config/` directory for model parameters
-- **Weights & Biases** for experiment tracking
-- **Pytest** for automated testing
-- **Hugging Face** and **Ollama** for model deployment
-
-## File Structure
-
-```yaml
-LLM-Finetuning-Playground/
-├── config/                           # Configuration files
-│   ├── sentiment_analysis.yaml       # Sentiment analysis training configuration
-│   ├── text_generation.yaml          # Recipe generation base configuration
-│   ├── text_generation_medium_memory.yaml # Medium memory configuration
-│   └── text_generation_low_memory.yaml # Low memory configuration
-├── data/                             # Data directories
-├── models/                           # Saved model checkpoints
-├── src/                              # Source code
-│   ├── data/                         # Data processing
-│   ├── model/                        # Model training and inference
-│   └── utils/                        # Utility functions
-├── tests/                            # Automated tests
-├── GETTING_STARTED_DEMO_1.md         # Sentiment analysis guide
-├── GETTING_STARTED_DEMO_2.md         # Recipe generation guide
-├── requirements.txt                  # Project dependencies
-├── setup_env.sh                      # Environment setup script
-└── Makefile                          # Automation of common tasks
+```
+<|system|>You are a recipe assistant. Create detailed recipes with exact measurements and clear instructions.<|endoftext|>
+<|user|>Write a complete recipe using these ingredients: {ingredients}. Include a title, ingredients list with measurements, and numbered cooking steps.<|endoftext|>
+<|assistant|>
 ```
 
-## Integrations
+This specific format with special tokens (`<|system|>`, `<|user|>`, `<|assistant|>`) is critical for proper functioning, as the model was trained with this exact pattern. Incorrect prompt formats will result in poor quality outputs.
 
-- **Hugging Face Transformers & Datasets**: For models, tokenizers, and data loading
+See the following documentation for more details:
+- [Getting Started Guide](GETTING_STARTED.md) - Basic usage instructions
+- [Prompt Format Guide](docs/PROMPT_FORMAT.md) - Detailed prompt formatting guidance
+- [Test Examples Guide](docs/TEST_EXAMPLES.md) - Information about test examples
+- [Testing Guide](docs/TESTING_GUIDE.md) - Best practices for testing the model
+
+## 🚀 Project Organization
+
+```
+LLM-Finetuning-Recipe-Assistant/
+├── config/                  # Training configurations for different hardware
+├── data/                    # Data processing and storage
+├── models/                  # Saved model checkpoints
+├── src/                     # Source code
+│   ├── data/                # Dataset preparation and processing
+│   ├── model/               # Model training and evaluation
+│   └── utils/               # Utility functions
+├── tests/                   # Test suite for model verification
+└── scripts/                 # Helper scripts for optimization
+```
+
+## 🔧 Key Components
+
+- **Training Pipeline**: `src/model/recipe_train.py` - Trains the recipe generation model
+- **Evaluation Tools**: `src/model/recipe_evaluate.py` - Tests model quality
+- **Demo Interfaces**: 
+  - CLI: `src/recipe_demo.py` - Command-line testing
+  - Web UI: `src/recipe_web_demo.py` - Browser-based interface
+- **Test Suite**: `tests/test_recipe_model.py` - Automated testing
+
+## 🔌 Integrations
+
+- **Hugging Face**: Model architecture and training utilities
 - **PEFT**: Parameter-Efficient Fine-Tuning with LoRA
-- **Pytest**: For unit and integration testing
-- **Weights & Biases**: For experiment tracking
-- **Ollama**: For local deployment of recipe generation models
+- **Pytest**: Automated testing framework
+- **Weights & Biases**: Experiment tracking
+- **Ollama**: Local model deployment
+
+## 📚 Next Steps
+
+- See the [Getting Started Guide](GETTING_STARTED.md) for detailed instructions
+- Explore the test suite to understand ML testing approaches
+- Experiment with different configurations and model parameters
+- Try creating your own test cases for the model

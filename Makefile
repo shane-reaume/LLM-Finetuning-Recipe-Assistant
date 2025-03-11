@@ -1,48 +1,9 @@
-.PHONY: setup test train evaluate demo clean coverage publish-sentiment update-model-card recipe-data recipe-train recipe-train-low-memory recipe-train-medium-memory recipe-evaluate recipe-demo recipe-export recipe-export-versioned recipe-train-test recipe-train-test-cpu
+.PHONY: setup test recipe-data recipe-train recipe-train-low-memory recipe-train-medium-memory recipe-evaluate recipe-demo recipe-export recipe-export-versioned recipe-train-test recipe-train-test-cpu recipe-quality-check
 
 # Setup environment
 setup:
 	chmod +x setup_env.sh
 	./setup_env.sh
-
-# Create test sets
-test-set:
-	python -m src.data.sentiment_create_test_set
-
-# Train the model
-train:
-	python -m src.model.sentiment_train
-
-# Evaluate the model
-evaluate:
-	python -m src.model.evaluate --test_file data/processed/sentiment_test_examples.json
-
-# Run the demo
-demo:
-	python -m src.demo
-
-# Interactive demo
-demo-interactive:
-	python -m src.demo --interactive
-
-# Publish sentiment model to Hugging Face
-publish-sentiment:
-	@if [ -z "$(REPO_NAME)" ]; then \
-		echo "Error: REPO_NAME is required (e.g., make publish-sentiment REPO_NAME=username/model-name)"; \
-		exit 1; \
-	fi
-	python -m src.model.sentiment_publish --repo_name="$(REPO_NAME)"
-
-# Update model card on Hugging Face
-update-model-card:
-	@if [ -z "$(REPO_NAME)" ]; then \
-		echo "Error: REPO_NAME is required (e.g., make update-model-card REPO_NAME=username/model-name)"; \
-		exit 1; \
-	fi
-	@if [ -z "$(MODEL_CARD)" ]; then \
-		MODEL_CARD="model_card.md"; \
-	fi
-	python -m src.model.update_model_card --repo_name="$(REPO_NAME)" --model_card="$(MODEL_CARD)"
 
 # Recipe model targets
 recipe-data:
@@ -98,6 +59,25 @@ recipe-train-geforce-rtx-3060:
 		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/text_generation_3060_geforce_rtx.yaml --data_dir $(DATA_DIR); \
 	fi
 
+test-recipe-train-geforce-rtx-3060:
+	@if [ -z "$(DATA_DIR)" ]; then \
+		echo "Warning: DATA_DIR not specified. The script may fail if dataset preparation hasn't been completed."; \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:256,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/test_text_generation_3060_geforce_rtx.yaml; \
+	else \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:256,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/test_text_generation_3060_geforce_rtx.yaml --data_dir $(DATA_DIR); \
+	fi
+
+test-recipe-3060:
+	@if [ -z "$(INGREDIENTS)" ]; then \
+		echo "Error: INGREDIENTS is required (e.g., make test-recipe-3060 INGREDIENTS=\"chicken, rice, garlic\")"; \
+		exit 1; \
+	fi; \
+	if [ -z "$(MODEL_DIR)" ]; then \
+		MODEL_DIR="models/test_recipe_assistant_3060_geforce_rtx"; \
+		echo "Using default model directory: $$MODEL_DIR"; \
+	fi; \
+	python -m src.test_3060_recipe_model --model_dir="$$MODEL_DIR" --ingredients="$(INGREDIENTS)" $(if $(TEMPERATURE),--temperature $(TEMPERATURE),) $(if $(MAX_TOKENS),--max_tokens $(MAX_TOKENS),)
+
 recipe-train-geforce-rtx-2070:
 	@if [ -z "$(DATA_DIR)" ]; then \
 		echo "Warning: DATA_DIR not specified. The script may fail if dataset preparation hasn't been completed."; \
@@ -117,11 +97,25 @@ recipe-train-optimized:
 recipe-evaluate:
 	python -m src.model.recipe_evaluate --config config/text_generation.yaml
 
+recipe-quality-check:
+	@if [ -z "$(INGREDIENTS)" ]; then \
+		echo "Error: INGREDIENTS is required (e.g., make recipe-quality-check INGREDIENTS=\"chicken, rice, garlic\")"; \
+		exit 1; \
+	fi; \
+	if [ -z "$(MODEL_DIR)" ]; then \
+		MODEL_DIR="models/recipe_assistant"; \
+		echo "Using default model directory: $$MODEL_DIR"; \
+	fi; \
+	python -m src.recipe_quality_check --model_dir="$$MODEL_DIR" --ingredients="$(INGREDIENTS)" $(if $(TEMPERATURE),--temperature $(TEMPERATURE),) $(if $(MAX_TOKENS),--max_tokens $(MAX_TOKENS),)
+
 recipe-demo:
 	python -m src.recipe_demo
 
 recipe-demo-interactive:
 	python -m src.recipe_demo --interactive
+
+recipe-web-demo:
+	python -m src.recipe_web_demo
 
 # Export recipe model to Ollama
 recipe-export:

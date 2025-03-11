@@ -77,7 +77,7 @@ class WebRecipeGenerator:
             "step_by_step": f"Write a step-by-step recipe using these ingredients: {ingredients}\n\nRecipe Name:"
         }
         
-        prompt = prompt_templates.get(prompt_style, prompt_templates["basic"])
+        prompt = prompt_templates.get(prompt_style, prompt_templates["step_by_step"])
         
         # Tokenize and generate
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)

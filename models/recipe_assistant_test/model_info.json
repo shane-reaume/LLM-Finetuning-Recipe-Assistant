@@ -1,6 +1,6 @@
 {
   "model_name": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
-  "max_length": 32,
-  "prompt_template": "Create a recipe with these ingredients: {ingredients}\n\n",
+  "max_length": 256,
+  "prompt_template": "<|system|>You are a recipe assistant that creates detailed recipes from ingredients. Always follow the exact format below.<|endoftext|>\n<|user|>Create a recipe using these ingredients: {ingredients}<|endoftext|>\n<|assistant|>I will create a recipe using these ingredients following the required format:\n\nTitle: [Recipe Name]\n\nIngredients:\n- [List each ingredient with exact measurements]\n\nInstructions:\n1. [First step]\n2. [Second step]\n3. [Continue with numbered steps]\n<|endoftext|>\n",
   "lora_enabled": true
 }

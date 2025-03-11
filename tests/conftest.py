@@ -10,6 +10,6 @@ sys.path.insert(0, project_root)
 import pytest
 
 @pytest.fixture
-def config_path():
-    """Return the path to the test configuration file"""
-    return os.path.join(project_root, "config", "sentiment_analysis.yaml")
+def recipe_config_path():
+    """Return the path to the recipe test configuration file"""
+    return os.path.join(project_root, "config", "text_generation_test.yaml")
