@@ -144,6 +144,11 @@ Choose based on your GPU's VRAM:
 | Medium-Memory | 8GB+ | `make recipe-train-medium-memory DATA_DIR=~/recipe_manual_data` |
 | Low-Memory | 6GB+ | `make recipe-train-low-memory DATA_DIR=~/recipe_manual_data` |
 
+```bash
+# I've optimized this for my GeForce RTX 3060 setup, so worth glossing over for ideas
+make recipe-train-geforce-rtx-3060 DATA_DIR=~/recipe_manual_data
+```
+
 **QA During Training**: The training process includes:
 - Progress tracking with WandB
 - Regular evaluation on validation data

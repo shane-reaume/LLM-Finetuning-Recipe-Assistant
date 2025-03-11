@@ -5,9 +5,9 @@ data:
   dataset_name: "recipe_nlg"
   train_split: "train"
   validation_split: "validation"
-  prompt_template: "Create a recipe with Title, Ingredients, and Instructions using these ingredients: {ingredients}\n\n"
+  prompt_template: "<|system|>You are a recipe assistant. Create detailed recipes with exact measurements and clear instructions.<|endoftext|>\n<|user|>Write a complete recipe using these ingredients: {ingredients}. Include a title, ingredients list with measurements, and numbered cooking steps.<|endoftext|>\n<|assistant|>"
   response_key: "recipe"
-  max_length: 256
+  max_length: 512
   cache_dir: "./data/processed/generation"
   max_train_samples: 100000
 
@@ -18,22 +18,22 @@ model:
 
 # Training settings
 training:
-  batch_size: 8
+  batch_size: 4
   batch_first: true
-  gradient_accumulation_steps: 8
+  gradient_accumulation_steps: 16
   gradient_checkpointing: true  # Trades computation for memory
   num_train_epochs: 4
   learning_rate: 2.0e-5
   weight_decay: 0.01
   warmup_steps: 100
-  save_steps: 1000
+  save_steps: 500
   save_total_limit: 2
   logging_dir: "./logs/recipe_assistant_3060_geforce_rtx"
   evaluation_strategy: "steps"
-  eval_steps: 1000
+  eval_steps: 500
   fp16: true
-  fp16_full_eval: true
-  # fp16_opt_level: "O1"
+  # fp16_full_eval: true
+  fp16_opt_level: "O1"
   use_flash_attention_2: true
   # report_to: "wandb"
   run_name: "recipe_assistant_3060_geforce_rtx"
@@ -53,11 +53,15 @@ training:
 testing:
   test_examples_file: "data/processed/recipe_test_examples.json"
   generation_params:
-    max_new_tokens: 256
+    max_new_tokens: 512
     temperature: 0.7
-    top_p: 0.9
+    top_p: 0.92
     top_k: 50
     do_sample: true
+    repetition_penalty: 1.2
+    no_repeat_ngram_size: 3
+    remove_invalid_values: true
+    num_beams: 1
   evaluation_metrics:
     - perplexity
     - rouge
