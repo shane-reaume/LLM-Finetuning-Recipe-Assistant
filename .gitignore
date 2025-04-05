@@ -234,9 +234,9 @@ wandb/
 # Gradio certificates and local files# Gradio certificates and local files
 
 
+# deb files like cuda keyrings
 
-
-
+*all.deb
 
 
 

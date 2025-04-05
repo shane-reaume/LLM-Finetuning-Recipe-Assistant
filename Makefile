@@ -1,4 +1,4 @@
-.PHONY: setup test train evaluate demo clean coverage publish-sentiment update-model-card recipe-data recipe-train recipe-train-low-memory recipe-train-medium-memory recipe-evaluate recipe-demo recipe-export recipe-export-versioned recipe-train-test recipe-train-test-cpu
+.PHONY: setup test train evaluate demo clean coverage publish-sentiment update-model-card recipe-data recipe-train recipe-train-low-memory recipe-train-medium-memory recipe-evaluate recipe-demo recipe-export recipe-export-versioned recipe-train-test recipe-train-test-cpu recipe-train-5070
 
 # Setup environment
 setup:
@@ -112,6 +112,19 @@ recipe-train-optimized:
 		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/text_generation_optimized.yaml; \
 	else \
 		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/text_generation_optimized.yaml --data_dir $(DATA_DIR); \
+	fi
+
+recipe-train-5070:
+	# Optimized for NVIDIA GeForce RTX 5070 (12GB VRAM)
+	# Requires CUDA 12.1+ and PyTorch nightly build with CUDA 12.1 support
+	# Install with: pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu121
+	# Configuration: 500k samples, batch_size=32, gradient_accumulation=32
+	# LoRA enabled (r=32, alpha=32), FP16 training
+	@if [ -z "$(DATA_DIR)" ]; then \
+		echo "Warning: DATA_DIR not specified. The script may fail if dataset preparation hasn't been completed."; \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/text_generation_5070_geforce_rtx.yaml; \
+	else \
+		PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/text_generation_5070_geforce_rtx.yaml --data_dir $(DATA_DIR); \
 	fi
 
 recipe-evaluate:

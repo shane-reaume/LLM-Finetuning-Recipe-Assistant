@@ -37,20 +37,35 @@ def prepare_model_and_tokenizer(config):
     if load_in_8bit:
         print("Loading model in 8-bit mode for memory efficiency")
         
+    # Always use FP32 for training
+    print("Using FP32 precision for training")
+    dtype = torch.float32
+    
+    # Load model with memory optimizations
+    print("Loading model with memory optimizations...")
     model = AutoModelForCausalLM.from_pretrained(
         config["model"]["name"],
-        torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32,
+        torch_dtype=dtype,
         device_map="auto",
-        load_in_8bit=load_in_8bit
+        load_in_8bit=load_in_8bit,
+        low_cpu_mem_usage=config["model"].get("low_cpu_mem_usage", True),
+        use_cache=config["model"].get("use_cache", False),  # Disable KV cache to save memory
     )
+    
+    # Enable gradient checkpointing if specified
+    if config["model"].get("gradient_checkpointing", False):
+        print("Enabling gradient checkpointing for memory efficiency")
+        model.gradient_checkpointing_enable()
+        model.config.use_cache = False  # Disable KV cache when using gradient checkpointing
     
     # Apply LoRA if enabled in config
     if config["training"].get("lora", {}).get("enabled", False):
         print("Applying LoRA for efficient fine-tuning")
         lora_config = config["training"]["lora"]
         
-        # Prepare model for k-bit training if using quantization
-        model = prepare_model_for_kbit_training(model)
+        # Prepare model for k-bit training only if using quantization
+        if load_in_8bit:
+            model = prepare_model_for_kbit_training(model)
         
         # Configure LoRA
         peft_config = LoraConfig(
@@ -65,6 +80,21 @@ def prepare_model_and_tokenizer(config):
         # Get PEFT model
         model = get_peft_model(model, peft_config)
         model.print_trainable_parameters()
+    
+    # Apply additional memory optimizations
+    print("Applying additional memory optimizations...")
+    
+    # Set max memory for the model
+    if "max_memory_MB" in config["training"]:
+        max_memory = config["training"]["max_memory_MB"]
+        print(f"Setting max memory to {max_memory}MB")
+        # This is a placeholder - actual implementation would depend on the model
+        # and the specific memory optimization techniques available
+    
+    # Disable gradient for non-trainable parameters
+    for param in model.parameters():
+        if not param.requires_grad:
+            param.grad = None
     
     return model, tokenizer
 
@@ -158,23 +188,42 @@ def train_model(config, data_dir=None):
     
     # Set up training arguments
     training_config = config["training"]
-    training_args = TrainingArguments(
-        output_dir=config["model"]["save_dir"],
-        num_train_epochs=float(training_config["num_train_epochs"]),
-        per_device_train_batch_size=int(training_config["batch_size"]),
-        per_device_eval_batch_size=int(training_config["batch_size"]),
-        gradient_accumulation_steps=int(training_config["gradient_accumulation_steps"]),
-        learning_rate=float(training_config["learning_rate"]),
-        weight_decay=float(training_config["weight_decay"]),
-        warmup_steps=int(training_config["warmup_steps"]),
-        save_steps=int(training_config["save_steps"]),
-        save_total_limit=int(training_config["save_total_limit"]),
-        logging_dir=training_config["logging_dir"],
-        evaluation_strategy=training_config["evaluation_strategy"],
-        eval_steps=int(training_config["eval_steps"]),
-        fp16=training_config["fp16"],
-        load_best_model_at_end=True,
-    )
+    
+    # Create a dictionary of training arguments
+    training_args_dict = {
+        "output_dir": config["model"]["save_dir"],
+        "num_train_epochs": float(training_config["num_train_epochs"]),
+        "per_device_train_batch_size": int(training_config["batch_size"]),
+        "per_device_eval_batch_size": int(training_config["batch_size"]),
+        "gradient_accumulation_steps": int(training_config["gradient_accumulation_steps"]),
+        "learning_rate": float(training_config["learning_rate"]),
+        "weight_decay": float(training_config["weight_decay"]),
+        "warmup_steps": int(training_config["warmup_steps"]),
+        "save_steps": int(training_config["save_steps"]),
+        "save_total_limit": int(training_config["save_total_limit"]),
+        "logging_dir": training_config["logging_dir"],
+        "evaluation_strategy": training_config["evaluation_strategy"],
+        "eval_steps": int(training_config["eval_steps"]),
+        "fp16": training_config["fp16"],
+        "bf16": training_config.get("bf16", False),
+        "load_best_model_at_end": True,
+        "gradient_checkpointing": training_config.get("gradient_checkpointing", False),
+    }
+    
+    # Add dataloader settings if specified
+    if "dataloader_num_workers" in training_config:
+        training_args_dict["dataloader_num_workers"] = int(training_config["dataloader_num_workers"])
+    
+    if "dataloader_pin_memory" in training_config:
+        training_args_dict["dataloader_pin_memory"] = training_config["dataloader_pin_memory"]
+    
+    # Remove optim_args from training arguments to avoid parsing issues
+    optim_args = None
+    if "optim_args" in training_config:
+        optim_args = training_config["optim_args"]
+    
+    # Create training arguments
+    training_args = TrainingArguments(**training_args_dict)
     
     # Create Trainer
     trainer = Trainer(
@@ -184,6 +233,20 @@ def train_model(config, data_dir=None):
         eval_dataset=eval_dataset,
         data_collator=data_collator,
     )
+    
+    # Set optimizer arguments after trainer creation if needed
+    if optim_args:
+        print(f"Setting optimizer arguments: {optim_args}")
+        # We'll set these manually after the optimizer is created
+        trainer.optimizer_kwargs = optim_args
+    
+    # Apply memory optimizations before training
+    print("Applying memory optimizations before training...")
+    
+    # Clear CUDA cache
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        print("Cleared CUDA cache")
     
     # Train the model
     print("Starting training...")

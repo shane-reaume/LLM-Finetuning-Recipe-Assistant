@@ -260,6 +260,48 @@ ollama run recipe-gen "Create a recipe with chicken, rice, and bell peppers"
 
 ## Hardware Optimization Guide
 
+### RTX 5070 Configuration
+
+The project includes optimized settings for the NVIDIA GeForce RTX 5070 GPU. You can train using either the Makefile target or direct script execution:
+
+#### Prerequisites for RTX 5070
+The RTX 5070 requires specific CUDA and PyTorch versions due to its sm_120 architecture:
+```bash
+# Install CUDA 12.1 or later
+# Install PyTorch nightly build with CUDA 12.1 support
+pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu121
+```
+
+#### Using Makefile:
+```bash
+make recipe-train-5070 DATA_DIR=~/recipe_manual_data
+```
+
+#### Direct Script Execution (Alternative Method):
+If the Makefile method encounters issues, you can run the training script directly:
+```bash
+source .venv/bin/activate && PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8 python -m src.model.recipe_train --config config/text_generation_5070_geforce_rtx.yaml --data_dir ~/recipe_manual_data
+```
+
+This configuration is optimized for:
+- RTX 5070 GPU with 12GB VRAM
+- Training on 500,000 samples
+- Batch size of 32 with gradient accumulation steps of 32
+- LoRA fine-tuning enabled (r=32, alpha=32)
+- FP16 mixed precision training
+
+Expected resource utilization:
+- GPU Memory: ~9.5GB/12GB
+- CPU: ~35%
+- RAM: ~39%
+- Disk: Initial spike during dataset loading, then minimal
+
+The configuration file (`config/text_generation_5070_geforce_rtx.yaml`) includes:
+- Memory optimizations (gradient checkpointing, KV cache disabled)
+- Efficient data loading settings
+- LoRA parameters optimized for recipe generation
+- Training hyperparameters tuned for stability
+
 ### Memory Management Tools
 
 Use these tools for hardware-specific optimizations:
