@@ -237,7 +237,8 @@ wandb/
 # deb files like cuda keyrings
 
 *all.deb
-
+*all.deb.1
+*all.deb.tar.gz
 
 
 
